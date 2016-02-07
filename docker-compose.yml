@@ -1,0 +1,13 @@
+pg:
+  image: rlesouef/alpine-postgres
+mongo:
+  image: mvertes/alpine-mongo
+server:
+  build: .
+  links:
+    - pg
+    - mongo
+  environment:
+    - PGHOST=db
+    - PGDATABASE=postgres
+    - PGUSER=postgres
