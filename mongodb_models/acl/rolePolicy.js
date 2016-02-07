@@ -1,11 +1,11 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-// Define our user policy schema
-var UserPolicySchema = new mongoose.Schema({
-  _user: {
+// Define our role policy schema
+var RolePolicySchema = new mongoose.Schema({
+  _role: {
     type: Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'Role'
   },
   _resource: {
     type: Schema.Types.ObjectId,
@@ -37,7 +37,7 @@ var UserPolicySchema = new mongoose.Schema({
 });
 
 // Add unique keys
-UserPolicySchema.index({ _user: 1, _resource: 1, _permission: 1 }, { unique: true });
+RolePolicySchema.index({ _role: 1, _resource: 1, _permission: 1 }, { unique: true });
 
 // Export the Mongoose model
-module.exports = mongoose.model('UserPolicy', UserPolicySchema);
+module.exports = mongoose.model('RolePolicy', RolePolicySchema);

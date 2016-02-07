@@ -36,7 +36,7 @@ server.deserializeClient(function(id, callback) {
 });
 
 // Exchange credentials for authorization code (authorization code grant)
-server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, req, callback) {
+server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, /*req,*/ callback) {
   // Create a new authorization code
   var newCode = new Code({
     value: uid(8),
@@ -47,14 +47,14 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, re
 
   // Save the auth code and check for errors
   newCode.saveAsync()
-  .spread(function(code, numberAffected) {
+  .then(function(code) {
     return code.value;
   })
   .nodeify(callback);
 }));
 
 // Exchange authorization code for access token (authorization code grant)
-server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, req, callback) {
+server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, /*req,*/ callback) {
   Code.findOneAsync({
     value: code
   })
@@ -74,7 +74,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, re
     return Code.removeAsync();
   })
   .then(function() {
-    return createTokensAsync(client, this.authCode._user, req);
+    return createTokensAsync(client, this.authCode._user/*, req*/);
   })
   .nodeify(function(err, token, refresh, expires) {
     if (!err) {
@@ -90,7 +90,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, re
 }));
 
 // Exchange credentials for access token (resource owner password credentials grant)
-server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, req, callback) {
+server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, /*req,*/ callback) {
   User.findOneAsync({
     username: username
   })
@@ -110,7 +110,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
     }
   })
   .then(function() {
-    return createTokensAsync(client, this.user._id, req);
+    return createTokensAsync(client, this.user._id/*, req*/);
   })
   .nodeify(function(err, token, refresh, expires) {
     if (!err) {
@@ -126,7 +126,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
 }));
 
 // Exchange refresh token with new access token (refresh token grant)
-server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope/* //TODO: wait for pull request on oauth2orize module, req*/, callback) {
+server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, /*req,*/ callback) {
   Token.findOneAsync({
     refresh: refreshToken
   })
@@ -166,8 +166,8 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
 }));
 
 // Exchange credentials for access token (client credentials grant)
-server.exchange(oauth2orize.exchange.clientCredentials(function(client, scope, req, callback) {
-  createTokensAsync(client, null, req)
+server.exchange(oauth2orize.exchange.clientCredentials(function(client, scope, /*req,*/ callback) {
+  createTokensAsync(client, null/*, req*/)
   .spread(function(token, refresh, expiration) {
     callback(null, token, refresh, expiration);
   })
@@ -239,9 +239,10 @@ var createTokensAsync = function(client, userId, req) {
         address: ipAddress,
         ua: userAgent
       });
+
       return token.saveAsync();
     })
-    .spread(function(token, numberAffected) {
+    .then(function(token, numberAffected) {
       var ret = [
         token.value,
         token.refresh,
@@ -261,7 +262,6 @@ var createJwtTokenAsync = function(client, userId, ipAddress, userAgent) {
     if (config.jwt.enabled === false) {
       resolve(uid(32));
     }
-
     var createdAt = parseInt(Date.now(), 10);
     var token = null;
 

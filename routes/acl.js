@@ -1,5 +1,6 @@
 var express = require('express');
 var authMiddleware = require('../middlewares/auth');
+var aclMiddleware = require('../middlewares/acl');
 var userController = require('../controllers/acl/user');
 var roleController = require('../controllers/acl/role');
 var resourceController = require('../controllers/acl/resource');
@@ -10,7 +11,7 @@ router.route('/users')
   .post(authMiddleware.isAuthenticated, userController.createUser);
 router.route('/users/:user?')
   .delete(authMiddleware.isAuthenticated, userController.deleteUser)
-  .get(authMiddleware.isAuthenticated, userController.getUser);
+  .get(authMiddleware.isAuthenticated, aclMiddleware.isAllowed, userController.getUser);
 
 router.route('/users/:user/roles')
   .post(authMiddleware.isAuthenticated, userController.addUserRole);
