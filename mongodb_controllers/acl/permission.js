@@ -14,7 +14,7 @@ var addPermission = function(req, res) {
   });
 
   permission.saveAsync()
-  .spread(function(ret) {
+  .then(function(ret) {
     handleSuccess(res, ret);
   })
   .catch(function(err) {

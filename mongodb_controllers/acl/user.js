@@ -19,7 +19,7 @@ var addUser = function(req, res) {
   });
 
   user.saveAsync()
-  .spread(function(ret) {
+  .then(function(ret) {
     handleSuccess(res, ret);
   })
   .catch(function(err) {
@@ -92,7 +92,7 @@ var addUserRole = function(req, res) {
   });
 
   userRole.saveAsync()
-  .spread(function(ret) {
+  .then(function(ret) {
     handleSuccess(res, ret);
   })
   .catch(function(err) {
@@ -193,7 +193,7 @@ var addUserPolicy = function(req, res) {
   });
 
   userPolicy.saveAsync()
-  .spread(function(ret) {
+  .then(function(ret) {
     handleSuccess(res, ret);
   })
   .catch(function(err) {

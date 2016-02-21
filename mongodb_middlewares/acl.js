@@ -1,14 +1,19 @@
+var User = require('../models/user');
+var Token = require('../models/token');
+var headerHelper = require('../utils/headerParser');
 
-var isAllowed = function(req, res, next) {
-  //Get userId by token or basic auth in req header
+var isAllowed = function(resource, permission) {
+  return function(req, res, next) {
+    var isBearerAuth = false;
+    var credentials = headerHelper.getBasicAuthentication(req);
+    if (credentials == null) {
+      isBearerAuth = true;
+      credentials = headerHelper.getBearerToken(req);
+    }
 
-  //Get all user's policies
-  //Get all user's roles
-  //Get all roles' policies
 
-  //Check if user has the policy
-
-  return next();
+    next();
+  }
 }
 
 exports.isAllowed = isAllowed;

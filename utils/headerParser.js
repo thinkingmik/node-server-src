@@ -10,13 +10,31 @@ var getUserAgent = function(req) {
 
 var getToken = function(req) {
   var token = null;
-  
-  if (req && req.headers['authorization']) {
-    var bearer = req.headers['authorization'];
-    token = bearer.replace('Bearer', '').trim();
+  var auth = req.headers['authorization'];
+
+  if (req && auth) {
+    token = auth.replace('Bearer', '').trim();
   }
 
   return token;
+}
+
+var getBasicAuth = function(req) {
+  var credentials = null;
+  var auth = req.headers['authorization'];
+
+  if (req && auth && auth.indexOf('Basic') >= 0) {
+    var b64Credentials = auth.replace('Basic', '').trim();
+    var buf = new Buffer(b64Credentials, 'base64');
+    var temp = buf.toString().split(':');
+
+    credentials = {
+      'username': temp[0],
+      'password': temp[1]
+    };
+  }
+
+  return credentials;
 }
 
 var getIPAddress = function(req) {
@@ -34,3 +52,4 @@ var getIPAddress = function(req) {
 module.exports.getIP = getIPAddress;
 module.exports.getUA = getUserAgent;
 module.exports.getBearerToken = getToken;
+module.exports.getBasicAuthentication = getBasicAuth;

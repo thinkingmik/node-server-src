@@ -14,7 +14,7 @@ var addResource = function(req, res) {
   });
 
   resource.saveAsync()
-  .spread(function(ret) {
+  .then(function(ret) {
     handleSuccess(res, ret);
   })
   .catch(function(err) {

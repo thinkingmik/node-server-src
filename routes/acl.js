@@ -11,7 +11,7 @@ router.route('/users')
   .post(authMiddleware.isAuthenticated, userController.createUser);
 router.route('/users/:user?')
   .delete(authMiddleware.isAuthenticated, userController.deleteUser)
-  .get(authMiddleware.isAuthenticated, aclMiddleware.isAllowed, userController.getUser);
+  .get(authMiddleware.isAuthenticated, aclMiddleware.isAllowed('getUser'), userController.getUser);
 
 router.route('/users/:user/roles')
   .post(authMiddleware.isAuthenticated, userController.addUserRole);
@@ -30,6 +30,12 @@ router.route('/roles')
 router.route('/roles/:role?')
   .delete(authMiddleware.isAuthenticated, roleController.deleteRole)
   .get(authMiddleware.isAuthenticated, roleController.getRole);
+
+router.route('/roles/:role/policies')
+  .post(authMiddleware.isAuthenticated, roleController.addRolePolicy);
+router.route('/roles/:role/policies/:resource?/:permission?')
+  .delete(authMiddleware.isAuthenticated, roleController.removeRolePolicy)
+  .get(authMiddleware.isAuthenticated, roleController.getRolePolicy);
 
 router.route('/resources')
   .post(authMiddleware.isAuthenticated, resourceController.createResource);
