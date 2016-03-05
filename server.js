@@ -11,6 +11,20 @@ var passport = require('passport');
 var config = require('./configs/config');
 var app = express();
 
+/*
+var User = require('./knex_models/user');
+User.findById(2, function(err, res) {
+  if (!err) {
+    console.log(err);
+  }
+  else
+    console.log(res);
+});
+User.findById(2).then(function(res) {
+  console.log(res);
+}).catch(function(err) { console.log(err); });
+*/
+
 // Set bluebird Promise
 mongoose = Promise.promisifyAll(mongoose);
 mongoose.Promise = Promise;

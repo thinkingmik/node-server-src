@@ -10,7 +10,12 @@ module.exports = {
     algorithm: 'RS256'
   },
   mongoose: {
-    //uri: 'mongodb://172.17.0.2:27017/test'
     uri: 'mongodb://localhost:27017/test'
+  },
+  knex: {
+    client: 'pg',
+    connection: 'postgres://postgres:postgres@localhost:5432/node-server-src?charset=utf-8&ssl=true',
+    pool: { min: 2, max: 10 },
+    debug: false
   }
 }
