@@ -4,6 +4,7 @@
   "description": "Boilerplate for a node APIs server with OAuth2 support and ACL implementation",
   "main": "server.js",
   "scripts": {
+    "migrate": "",
     "test": "make test",
     "start": "node server.js"
   },

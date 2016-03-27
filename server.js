@@ -13,15 +13,9 @@ var app = express();
 
 /*
 var User = require('./knex_models/user');
-User.findById(2, function(err, res) {
-  if (!err) {
-    console.log(err);
-  }
-  else
-    console.log(res);
-});
-User.findById(2).then(function(res) {
-  console.log(res);
+User.findOne({ id: 2 }).then(function(res) {
+  var user = new User(res);
+  console.log(user);
 }).catch(function(err) { console.log(err); });
 */
 
