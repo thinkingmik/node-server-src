@@ -3,12 +3,6 @@ var knex = require('knex')(config.knex);
 var table = 'users';
 
 var User = function (data) {
-  this.sanitize(data);
-}
-
-User.prototype.entity = {}
-User.prototype.metadata = {}
-User.prototype.sanitize = function (data) {
   data = data || {};
   this.metadata = {
     id: data.id,
@@ -24,22 +18,48 @@ User.prototype.sanitize = function (data) {
   }
 }
 
-User.getTable = function() {
-  return table;
+User.prototype.getId = function () {
+  return this.metadata['id'];
+}
+User.prototype.get
+User.prototype.get = function (name) {
+    return this.entity[name];
+}
+User.prototype.set = function (name, value) {
+    this.entity[name] = value;
+}
+User.prototype.save = function () {
+    console.log(this);
+    /*
+    var self = this;
+    db.get('users', {id: this.data.id}).update(JSON.stringify(this.data)).run(function (err, result) {
+        if (err) return callback(err);
+        callback(null, self);
+    });
+    */
 }
 
 User.find = function (params) {
   var promise = knex.select('id', 'username', 'password', 'createdAt', 'updatedAt')
-    .from(this.getTable())
-    .where(params);
+    .from(table)
+    .then(function(res) {
+      var list = [];
+      for (var key in res) {
+        list.push(new User(res[key]));
+      }
+      return list;
+    });
 
   return promise;
 }
 
 User.findOne = function (params) {
   var promise = knex.first('id', 'username', 'password', 'createdAt', 'updatedAt')
-    .from(this.getTable())
-    .where(params);
+    .from(table)
+    .where(params)
+    .then(function(res) {
+      return new User(res);
+    });
 
   return promise;
 }
