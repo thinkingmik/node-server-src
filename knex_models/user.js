@@ -18,12 +18,16 @@ var User = function (data) {
   }
 }
 
-User.prototype.getId = function () {
-  return this.metadata['id'];
-}
-User.prototype.get
 User.prototype.get = function (name) {
-    return this.entity[name];
+    if (this.entity[name] != null) {
+      return this.entity[name];
+    }
+    else if (this.metadata[name] != null) {
+      return this.metadata[name];
+    }
+    else {
+      return null;
+    }
 }
 User.prototype.set = function (name, value) {
     this.entity[name] = value;
@@ -42,6 +46,7 @@ User.prototype.save = function () {
 User.find = function (params) {
   var promise = knex.select('id', 'username', 'password', 'createdAt', 'updatedAt')
     .from(table)
+    .where(params)
     .then(function(res) {
       var list = [];
       for (var key in res) {
