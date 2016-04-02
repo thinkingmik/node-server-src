@@ -16,6 +16,10 @@ module.exports = {
     client: 'pg',
     connection: 'postgres://postgres:postgres@localhost:5432/node-server-src?charset=utf-8&ssl=true',
     pool: { min: 2, max: 10 },
-    debug: false
+    debug: false,
+    migrations: {
+      directory: './knex/migrations',
+      tableName: 'migrations'
+    }
   }
 }

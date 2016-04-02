@@ -11,18 +11,6 @@ var passport = require('passport');
 var config = require('./configs/config');
 var app = express();
 
-/*
-var User = require('./knex_models/user');
-var u1 = new User({ email: 'foo' });
-var u2 = new User({ email: 'bar' });
-//u2.save();
-
-User.findOne({ id: 2 }).then(function(user) {
-  //var user = new User(res);
-  console.log(user.getId());
-}).catch(function(err) { console.log(err); });
-*/
-
 // Set bluebird Promise
 mongoose = Promise.promisifyAll(mongoose);
 mongoose.Promise = Promise;

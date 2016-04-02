@@ -4,7 +4,9 @@
   "description": "Boilerplate for a node APIs server with OAuth2 support and ACL implementation",
   "main": "server.js",
   "scripts": {
-    "migrate": "",
+    "drop": "node ./knex/drop.js",
+    "migrate": "node ./knex/start.js",
+    "initdb": "npm run migrate",
     "test": "make test",
     "start": "node server.js"
   },
