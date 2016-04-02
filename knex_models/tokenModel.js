@@ -1,7 +1,7 @@
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
 var table = 'tokens';
-var columns = 'id', 'refresh', 'userAgent', 'ipAddress', 'userId', 'clientId', 'createdAt';
+var columns = ['id', 'refresh', 'userAgent', 'ipAddress', 'userId', 'clientId', 'createdAt'];
 
 /* ctor */
 var Token = function (data) {
@@ -20,13 +20,13 @@ var Token = function (data) {
 }
 
 /* Public methods */
-User.prototype.plain = function () {
+Token.prototype.plain = function () {
   for (var key in this.metadata) {
     this.entity[key] = this.metadata[key];
   }
   return this.entity;
 }
-User.prototype.get = function (name) {
+Token.prototype.get = function (name) {
     if (this.entity[name] != null) {
       return this.entity[name];
     }
@@ -37,10 +37,10 @@ User.prototype.get = function (name) {
       return null;
     }
 }
-User.prototype.set = function (name, value) {
+Token.prototype.set = function (name, value) {
     this.entity[name] = value;
 }
-User.prototype.save = function (trx) {
+Token.prototype.save = function (trx) {
   var plain = this.plain();
 
   plain['createdAt'] = knex.raw('now()');
@@ -53,9 +53,32 @@ User.prototype.save = function (trx) {
 
   return promise;
 }
+Token.prototype.remove = function (trx) {
+  var promise = knex(table)
+    .transacting(trx)
+    .where('id', '=', this.get('id'))
+    .del()
+    .then(function(res) {
+      return res[0];
+    });
+
+  return promise;
+}
 
 /* Static methods */
-User.find = function (params) {
+Token.remove = function (params, values, trx) {
+  var query = knex.raw(params, values);
+  var promise = knex(table)
+    .transacting(trx)
+    .where(query)
+    .del()
+    .then(function(res) {
+      return res[0];
+    });
+
+  return promise;
+}
+Token.find = function (params) {
   var promise = knex.select(columns)
     .from(table)
     .where(params)
@@ -69,12 +92,15 @@ User.find = function (params) {
 
   return promise;
 }
-User.findOne = function (params) {
+Token.findOne = function (params) {
   var promise = knex.first(columns)
     .from(table)
     .where(params)
     .then(function(res) {
-      return new Token(res);
+      if (res != null) {
+        return new Token(res);
+      }
+      return null;
     });
 
   return promise;

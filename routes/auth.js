@@ -1,7 +1,7 @@
 var express = require('express');
-var proxyMiddleware = require('../middlewares/proxy');
-var authMiddleware = require('../middlewares/auth');
-var oauth2Controller = require('../controllers/auth/oauth2');
+var proxyMiddleware = require('../knex_middlewares/proxyMiddleware');
+var authMiddleware = require('../knex_middlewares/authMiddleware');
+var oauth2Controller = require('../knex_controllers/oauth2Controller');
 var router = express.Router();
 
 // Create endpoint handlers for oauth2 authorize

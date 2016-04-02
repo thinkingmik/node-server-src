@@ -1,12 +1,10 @@
-var Promise = require('bluebird');
-var bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'));
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
-var table = 'clients';
-var columns = ['id', 'name', 'secret', 'description', 'domain', 'createdAt', 'updatedAt'];
+var table = 'roles';
+var columns = ['id', 'name', 'description', 'createdAt', 'updatedAt'];
 
 /* ctor */
-var Client = function (data) {
+var Role = function (data) {
   data = data || {};
   this.metadata = {
     id: data.id,
@@ -15,20 +13,18 @@ var Client = function (data) {
   }
   this.entity = {
     name: data.name,
-    secret: data.secret,
-    description: data.description,
-    domain: data.domain
+    description: data.description
   }
 }
 
 /* Public methods */
-Client.prototype.plain = function () {
+Role.prototype.plain = function () {
   for (var key in this.metadata) {
     this.entity[key] = this.metadata[key];
   }
   return this.entity;
 }
-Client.prototype.get = function (name) {
+Role.prototype.get = function (name) {
     if (this.entity[name] != null) {
       return this.entity[name];
     }
@@ -39,10 +35,10 @@ Client.prototype.get = function (name) {
       return null;
     }
 }
-Client.prototype.set = function (name, value) {
+Role.prototype.set = function (name, value) {
     this.entity[name] = value;
 }
-Client.prototype.save = function (trx) {
+Role.prototype.save = function (trx) {
   var plain = this.plain();
   plain['updatedAt'] = knex.raw('now()');
 
@@ -70,43 +66,29 @@ Client.prototype.save = function (trx) {
     return promise;
   }
 }
-Client.prototype.verifySecret = function (secret) {
-  return bcrypt.compareAsync(secret, this.get('secret'));
-}
-Client.prototype.cryptSecret = function (secret) {
-  var promise = bcrypt.genSaltAsync(5)
-    .then(function(salt) {
-      return bcrypt.hashAsync(secret, salt, null);
-    })
-    .then(function(hash) {
-      return hash;
-    });
-
-  return promise;
-}
 
 /* Static methods */
-Client.find = function (params) {
+Role.find = function (params) {
   var promise = knex.select(columns)
     .from(table)
     .where(params)
     .then(function(res) {
       var list = [];
       for (var key in res) {
-        list.push(new Client(res[key]));
+        list.push(new Role(res[key]));
       }
       return list;
     });
 
   return promise;
 }
-Client.findOne = function (params) {
+Role.findOne = function (params) {
   var promise = knex.first(columns)
     .from(table)
     .where(params)
     .then(function(res) {
       if (res != null) {
-        return new Client(res);
+        return new Role(res);
       }
       return null;
     });
@@ -114,4 +96,4 @@ Client.findOne = function (params) {
   return promise;
 }
 
-module.exports = Client;
+module.exports = Role;

@@ -3,9 +3,9 @@ html
   head
     title oauth2
   body
-    p Hi #{user.username}!
+    p Hi #{user.get('username')}!
     p
-      b #{client.name}
+      b #{client.get('name')}
       |  is requesting
       b full access
       |  to your account.

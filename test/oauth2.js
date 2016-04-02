@@ -30,7 +30,7 @@ describe('Client Credentials', function() {
   });
   it('should return an unauthorized code', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'client1234')
+      .auth('client', 'fake')
       .send({
         grant_type: 'client_credentials',
         scope: '*'

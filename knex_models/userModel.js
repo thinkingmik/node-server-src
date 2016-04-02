@@ -1,7 +1,9 @@
+var Promise = require('bluebird');
+var bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'));
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
 var table = 'users';
-var columns = 'id', 'username', 'password', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt';
+var columns = ['id', 'username', 'password', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt'];
 
 /* ctor */
 var User = function (data) {
@@ -69,6 +71,20 @@ User.prototype.save = function (trx) {
     return promise;
   }
 }
+User.prototype.verifyPassword = function (password) {
+  return bcrypt.compareAsync(password, this.get('password'));
+}
+User.prototype.cryptPassword = function (password) {
+  var promise = bcrypt.genSaltAsync(5)
+    .then(function(salt) {
+      return bcrypt.hashAsync(password, salt, null);
+    })
+    .then(function(hash) {
+      return hash;
+    });
+
+  return promise;
+}
 
 /* Static methods */
 User.find = function (params) {
@@ -90,7 +106,10 @@ User.findOne = function (params) {
     .from(table)
     .where(params)
     .then(function(res) {
-      return new User(res);
+      if (res != null) {
+        return new User(res);
+      }
+      return null;
     });
 
   return promise;

@@ -1,7 +1,7 @@
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
 var table = 'codes';
-var columns = 'id', 'redirectUri', 'userId', 'clientId', 'createdAt';
+var columns = ['id', 'redirectUri', 'userId', 'clientId', 'createdAt'];
 
 /* ctor */
 var Code = function (data) {
@@ -18,13 +18,13 @@ var Code = function (data) {
 }
 
 /* Public methods */
-User.prototype.plain = function () {
+Code.prototype.plain = function () {
   for (var key in this.metadata) {
     this.entity[key] = this.metadata[key];
   }
   return this.entity;
 }
-User.prototype.get = function (name) {
+Code.prototype.get = function (name) {
     if (this.entity[name] != null) {
       return this.entity[name];
     }
@@ -35,10 +35,10 @@ User.prototype.get = function (name) {
       return null;
     }
 }
-User.prototype.set = function (name, value) {
+Code.prototype.set = function (name, value) {
     this.entity[name] = value;
 }
-User.prototype.save = function (trx) {
+Code.prototype.save = function (trx) {
   var plain = this.plain();
 
   plain['createdAt'] = knex.raw('now()');
@@ -51,9 +51,20 @@ User.prototype.save = function (trx) {
 
   return promise;
 }
+Code.prototype.remove = function (trx) {
+  var promise = knex(table)
+    .transacting(trx)
+    .where('id', '=', this.get('id'))
+    .del()
+    .then(function(res) {
+      return res[0];
+    });
+
+  return promise;
+}
 
 /* Static methods */
-User.find = function (params) {
+Code.find = function (params) {
   var promise = knex.select(columns)
     .from(table)
     .where(params)
@@ -67,12 +78,15 @@ User.find = function (params) {
 
   return promise;
 }
-User.findOne = function (params) {
+Code.findOne = function (params) {
   var promise = knex.first(columns)
     .from(table)
     .where(params)
     .then(function(res) {
-      return new Code(res);
+      if (res != null) {
+        return new Code(res);
+      }
+      return null;
     });
 
   return promise;
