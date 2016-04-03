@@ -50,7 +50,8 @@ Client.prototype.save = function (trx) {
     var promise = knex(table)
       .transacting(trx)
       .where('id', '=', plain['id'])
-      .update(plain, 'id')
+      .returning('id')
+      .update(plain)
       .then(function(res) {
         return res[0];
       });
@@ -62,7 +63,8 @@ Client.prototype.save = function (trx) {
     plain['createdAt'] = knex.raw('now()');
     var promise = knex(table)
       .transacting(trx)
-      .insert(plain, 'id')
+      .returning('id')
+      .insert(plain)
       .then(function(res) {
         return res[0];
       });
@@ -75,7 +77,7 @@ Client.prototype.save = function (trx) {
 Client.find = function (params) {
   var promise = knex.select(columns)
     .from(table)
-    .where(params)
+    .where(params || {})
     .then(function(res) {
       var list = [];
       for (var key in res) {
@@ -89,7 +91,7 @@ Client.find = function (params) {
 Client.findOne = function (params) {
   var promise = knex.first(columns)
     .from(table)
-    .where(params)
+    .where(params || {})
     .then(function(res) {
       if (res != null) {
         return new Client(res);

@@ -6,7 +6,7 @@ var handleError = function(res, err) {
   }
 
   var template = {
-    status: 'error',
+    status: 'ERR',
     type: err.name,
     message: err.message,
     stack: err.stack
@@ -23,7 +23,7 @@ var handleError = function(res, err) {
 
 var handleSuccess = function(res, extra) {
   var ret = {
-    status: 'ok',
+    status: 'OK',
     data: extra
   }
 

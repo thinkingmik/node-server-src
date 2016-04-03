@@ -46,7 +46,8 @@ Permission.prototype.save = function (trx) {
     var promise = knex(table)
       .transacting(trx)
       .where('id', '=', plain['id'])
-      .update(plain, 'id')
+      .returning('id')
+      .update(plain)
       .then(function(res) {
         return res[0];
       });
@@ -71,7 +72,7 @@ Permission.prototype.save = function (trx) {
 Permission.find = function (params) {
   var promise = knex.select(columns)
     .from(table)
-    .where(params)
+    .where(params || {})
     .then(function(res) {
       var list = [];
       for (var key in res) {
@@ -85,7 +86,7 @@ Permission.find = function (params) {
 Permission.findOne = function (params) {
   var promise = knex.first(columns)
     .from(table)
-    .where(params)
+    .where(params || {})
     .then(function(res) {
       if (res != null) {
         return new Permission(res);

@@ -1,4 +1,4 @@
-var Client = require('../knex_models/clientModel');
+var Client = require('../models/clientModel');
 var NotFoundError = require('../exceptions/notFoundError');
 
 var fillClientCredentials = function(req, res, callback) {

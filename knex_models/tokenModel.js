@@ -46,7 +46,8 @@ Token.prototype.save = function (trx) {
   plain['createdAt'] = knex.raw('now()');
   var promise = knex(table)
     .transacting(trx)
-    .insert(plain, 'id')
+    .returning('id')
+    .insert(plain)
     .then(function(res) {
       return res[0];
     });
@@ -57,6 +58,7 @@ Token.prototype.remove = function (trx) {
   var promise = knex(table)
     .transacting(trx)
     .where('id', '=', this.get('id'))
+    .returning('id')
     .del()
     .then(function(res) {
       return res[0];
@@ -70,7 +72,8 @@ Token.remove = function (params, trx) {
   //var query = knex.raw(params, values);
   var promise = knex(table)
     .transacting(trx)
-    .where(params)
+    .where(params || {})
+    .returning('id')
     .del()
     .then(function(res) {
       return res[0];
@@ -81,7 +84,7 @@ Token.remove = function (params, trx) {
 Token.find = function (params) {
   var promise = knex.select(columns)
     .from(table)
-    .where(params)
+    .where(params || {})
     .then(function(res) {
       var list = [];
       for (var key in res) {
@@ -95,7 +98,7 @@ Token.find = function (params) {
 Token.findOne = function (params) {
   var promise = knex.first(columns)
     .from(table)
-    .where(params)
+    .where(params || {})
     .then(function(res) {
       if (res != null) {
         return new Token(res);
