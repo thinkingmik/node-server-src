@@ -21,7 +21,7 @@ var fillClientCredentials = function(req, res, callback) {
         throw new NotFoundError();
       }
       // Add secret key to request
-      req.body['client_secret'] = 'client123';//client.get('secret');
+      req.body['client_secret'] = client.get('secret');
     })
     .nodeify(function(err, result) {
       if (!err) {

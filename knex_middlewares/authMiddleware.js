@@ -54,29 +54,12 @@ passport.use('client-basic', new BasicStrategy(
     })
     .bind({})
     .then(function(client) {
-      this.client = client;
-      if (!client) {
-        throw new NotFoundError();
+      if (!client || client.get('secret') !== clientSecret) {
+        return false;
       }
-      return client.verifySecret(clientSecret);
+      return client;
     })
-    .then(function(isMatch) {
-      if (!isMatch) {
-        throw new NotFoundError();
-      }
-      return this.client;
-    })
-    .nodeify(function(err, result) {
-      if (!err) {
-        callback(null, result);
-      }
-      else if (err instanceof NotFoundError) {
-        callback(null, false);
-      }
-      else {
-        callback(err);
-      }
-    });
+    .nodeify(callback);
   }
 ));
 
@@ -88,29 +71,12 @@ passport.use('client-password', new ClientPasswordStrategy(
     })
     .bind({})
     .then(function(client) {
-      this.client = client;
-      if (!client) {
-        throw new NotFoundError();
+      if (!client || client.get('secret') !== clientSecret) {
+        return false;
       }
-      return client.verifySecret(clientSecret);
+      return client;
     })
-    .then(function(isMatch) {
-      if (!isMatch) {
-        throw new NotFoundError();
-      }
-      return this.client;
-    })
-    .nodeify(function(err, result) {
-      if (!err) {
-        callback(null, result);
-      }
-      else if (err instanceof NotFoundError) {
-        callback(null, false);
-      }
-      else {
-        callback(err);
-      }
-    });
+    .nodeify(callback);
   }
 ));
 

@@ -70,20 +70,6 @@ Client.prototype.save = function (trx) {
     return promise;
   }
 }
-Client.prototype.verifySecret = function (secret) {
-  return bcrypt.compareAsync(secret, this.get('secret'));
-}
-Client.prototype.cryptSecret = function (secret) {
-  var promise = bcrypt.genSaltAsync(5)
-    .then(function(salt) {
-      return bcrypt.hashAsync(secret, salt, null);
-    })
-    .then(function(hash) {
-      return hash;
-    });
-
-  return promise;
-}
 
 /* Static methods */
 Client.find = function (params) {

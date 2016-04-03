@@ -18,13 +18,11 @@ var server = oauth2orize.createServer();
 
 // Register serialialization function
 server.serializeClient(function(client, callback) {
-  return callback(null, client._id);
+  return callback(null, client.get('id'));
 });
 
 // Register deserialization function
 server.deserializeClient(function(id, callback) {
-
-console.log("deserialz");
   Client.findOne({
     id: id
   })
@@ -181,9 +179,9 @@ var doLogout = function(req, res) {
     if (!token) {
       throw new NotFoundError();
     }
-    return Token.remove(':userId: = :user AND :clientId: = :client', {
-      user: token.get('userId'),
-      client: token.get('clientId')
+    return Token.remove({
+      userId: token.get('userId'),
+      clientId: token.get('clientId')
     });
   })
   .then(function(ret) {
@@ -282,8 +280,6 @@ exports.authorization = [
       name: clientId
     })
     .then(function(client) {
-
-        console.log(callback);
       return [client, redirectUri];
     })
     .nodeify(callback, { spread: true });

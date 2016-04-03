@@ -66,11 +66,11 @@ Token.prototype.remove = function (trx) {
 }
 
 /* Static methods */
-Token.remove = function (params, values, trx) {
-  var query = knex.raw(params, values);
+Token.remove = function (params, trx) {
+  //var query = knex.raw(params, values);
   var promise = knex(table)
     .transacting(trx)
-    .where(query)
+    .where(params)
     .del()
     .then(function(res) {
       return res[0];
