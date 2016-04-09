@@ -47,13 +47,12 @@ exports.up = function(knex, Promise) {
       table.timestamp('createdAt').notNullable().defaultTo(knex.raw('now()'));
       table.timestamp('updatedAt').notNullable().defaultTo(knex.raw('now()'));
     }),
-    knex.schema.createTable('userRoles', function(table) {
+    knex.schema.createTable('usersRoles', function(table) {
       table.increments('id').primary();
       table.bigInteger('userId').unsigned().index().references('id').inTable('users').onDelete('CASCADE').onUpdate('CASCADE');
       table.bigInteger('roleId').unsigned().index().references('id').inTable('roles').onDelete('SET NULL').onUpdate('CASCADE');
-      table.string('name', 50).notNullable().unique();
+      table.unique(['userId', 'roleId']);
       table.boolean('main').defaultTo(false);
-      table.string('description', 255);
       table.timestamp('expiration');
       table.timestamp('createdAt').notNullable().defaultTo(knex.raw('now()'));
       table.timestamp('updatedAt').notNullable().defaultTo(knex.raw('now()'));

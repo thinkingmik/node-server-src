@@ -9,7 +9,6 @@ var Token = require('../models/tokenModel').Token;
 var Code = require('../models/codeModel').Code;
 var headerHelper = require('../utils/headerParser');
 var config = require('../configs/config');
-var knex = require('knex')(config.knex);
 var NotFoundError = require('../exceptions/notFoundError');
 var handleError = require('../utils/handleJsonResponse').Error;
 var handleSuccess = require('../utils/handleJsonResponse').Success;
@@ -191,13 +190,10 @@ var doLogout = function(req, res) {
     if (!token) {
       throw new NotFoundError();
     }
-    return knex('tokens')
-      .where({
+    return token.destroyAll({
         userId: token.get('userId'),
         clientId: token.get('clientId')
-      })
-      .returning('id')
-      .del();
+      });
   })
   .then(function(ret) {
     handleSuccess(res, ret);

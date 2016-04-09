@@ -3,10 +3,23 @@ var bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'));
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
 var bookshelf = require('bookshelf')(knex);
+var Token = require('./tokenModel').Token;
+var Code = require('./codeModel').Code;
+var Role = require('./roleModel').Role;
+var UserRole = require('./userRoleModel').UserRole;
 
 var User = bookshelf.Model.extend({
   tableName: 'users',
   hasTimestamps: ['createdAt', 'updatedAt'],
+  tokens: function() {
+    return this.hasMany(Token, 'userId');
+  },
+  codes: function() {
+    return this.hasMany(Code, 'userId');
+  },
+  roles: function() {
+    return this.hasMany(UserRole, 'userId');
+  },
   initialize: function () {
     this.on('creating', function (model) {
       return bcrypt.genSaltAsync(5)
