@@ -24,8 +24,9 @@ exports.up = function(knex, Promise) {
       table.timestamp('updatedAt').notNullable().defaultTo(knex.raw('now()'));
     }),
     knex.schema.createTable('tokens', function(table) {
-      table.string('id', 512).primary();
-      table.string('refresh', 512).notNullable().unique();
+      table.increments('id').primary();
+      table.string('token', 1024).notNullable().unique();
+      table.string('refresh', 1024).notNullable().unique();
       table.string('userAgent', 100);
       table.string('ipAddress', 15);
       table.bigInteger('userId').unsigned().index().references('id').inTable('users').onDelete('CASCADE').onUpdate('CASCADE');
@@ -33,8 +34,9 @@ exports.up = function(knex, Promise) {
       table.timestamp('createdAt').notNullable().defaultTo(knex.raw('now()'));
     }),
     knex.schema.createTable('codes', function(table) {
-      table.string('id', 50).primary();
-      table.string('redirectUri', 255).unique();
+      table.increments('id').primary();
+      table.string('code', 512).notNullable().unique();
+      table.string('redirectUri', 255);
       table.bigInteger('userId').unsigned().index().references('id').inTable('users').onDelete('CASCADE').onUpdate('CASCADE');
       table.bigInteger('clientId').unsigned().index().references('id').inTable('clients').onDelete('CASCADE').onUpdate('CASCADE');
       table.timestamp('createdAt').notNullable().defaultTo(knex.raw('now()'));

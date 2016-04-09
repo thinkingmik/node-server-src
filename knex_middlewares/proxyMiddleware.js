@@ -1,4 +1,4 @@
-var Client = require('../models/clientModel');
+var Client = require('../models/clientModel').Client;
 var NotFoundError = require('../exceptions/notFoundError');
 
 var fillClientCredentials = function(req, res, callback) {
@@ -13,9 +13,11 @@ var fillClientCredentials = function(req, res, callback) {
   }
 
   if (clientId && !clientSecret && !isBasicAuth) {
-    Client.findOne({
+    Client.forge()
+    .where({
       name: clientId
     })
+    .fetch()
     .then(function(client) {
       if (!client) {
         throw new NotFoundError();

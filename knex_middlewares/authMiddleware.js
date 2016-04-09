@@ -5,9 +5,9 @@ var BearerStrategy = require('passport-http-bearer').Strategy;
 var ClientPasswordStrategy  = require('passport-oauth2-client-password').Strategy;
 var Promise = require('bluebird');
 var headerHelper = require('../utils/headerParser');
-var User = require('../models/userModel');
-var Client = require('../models/clientModel');
-var Token = require('../models/tokenModel');
+var User = require('../models/userModel').User;
+var Client = require('../models/clientModel').Client;
+var Token = require('../models/tokenModel').Token;
 var config = require('../configs/config');
 var NotFoundError = require('../exceptions/notFoundError');
 var ExpiredTokenError = require('../exceptions/expiredTokenError');
@@ -15,9 +15,11 @@ var ExpiredTokenError = require('../exceptions/expiredTokenError');
 //Basic authentication
 passport.use('basic', new BasicStrategy(
   function(username, password, callback) {
-    User.findOne({
+    User.forge()
+    .where({
       username: username
     })
+    .fetch()
     .bind({})
     .then(function(user) {
       this.user = user;
@@ -49,9 +51,11 @@ passport.use('basic', new BasicStrategy(
 //Client authentication with credentials into header
 passport.use('client-basic', new BasicStrategy(
   function(clientId, clientSecret, callback) {
-    Client.findOne({
+    Client.forge()
+    .where({
       name: clientId
     })
+    .fetch()
     .bind({})
     .then(function(client) {
       if (!client || client.get('secret') !== clientSecret) {
@@ -66,9 +70,10 @@ passport.use('client-basic', new BasicStrategy(
 //Client authentication with credentials into body
 passport.use('client-password', new ClientPasswordStrategy(
   function(clientId, clientSecret, callback) {
-    Client.findOne({
+    Client.forge().where({
       name: clientId
     })
+    .fetch()
     .bind({})
     .then(function(client) {
       if (!client || client.get('secret') !== clientSecret) {
@@ -83,9 +88,11 @@ passport.use('client-password', new ClientPasswordStrategy(
 //Bearer authentication
 passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
   function(req, accessToken, callback) {
-    Token.findOne({
-      id: accessToken
+    Token.forge()
+    .where({
+      token: accessToken
     })
+    .fetch()
     .bind({})
     .then(function(token) {
       this.token = token;
@@ -104,7 +111,7 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
     })
     .then(function(isValidToken) {
       if (isValidToken === false) {
-        return this.token.remove();
+        return this.token.destroy();
       }
       return 0;
     })
@@ -116,14 +123,18 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
     })
     .then(function() {
       if (this.token.get('userId') != null) {
-        return User.findOne({
-          id: this.token.get('userId')
-        });
+        return User.forge()
+          .where({
+            id: this.token.get('userId')
+          })
+          .fetch();
       }
       else {
-        return Client.findOne({
-          id: this.token.get('clientId')
-        });
+        return Client.forge()
+          .where({
+            id: this.token.get('clientId')
+          })
+          .fetch();
       }
     })
     .then(function(ret) {
@@ -157,7 +168,7 @@ var verifyJwtToken = function (req, token) {
       secret = fs.readFileSync(config.jwt.cert);
     }
 
-    jwt.verify(token.get('id'), secret, { ignoreExpiration: false }, function(err, decoded) {
+    jwt.verify(token.get('token'), secret, { ignoreExpiration: false }, function(err, decoded) {
       if (!err) {
         var ipAddress = headerHelper.getIP(req);
         var userAgent = headerHelper.getUA(req);

@@ -1,5 +1,5 @@
-var User = require('../models/userModel');
-var Token = require('../models/tokenModel');
+var User = require('../models/userModel').User;
+var Token = require('../models/tokenModel').Token;
 var headerHelper = require('../utils/headerParser');
 
 var isAllowed = function(resource, permission) {

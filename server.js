@@ -5,18 +5,18 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var Promise = require('bluebird');
-var mongoose = require('mongoose');
+//var Promise = require('bluebird');
+//var mongoose = require('mongoose');
 var passport = require('passport');
 var config = require('./configs/config');
 var app = express();
 
 // Set bluebird Promise
-mongoose = Promise.promisifyAll(mongoose);
-mongoose.Promise = Promise;
+//mongoose = Promise.promisifyAll(mongoose);
+//mongoose.Promise = Promise;
 
 // Connect to MongoDB
-mongoose.connect(config.mongoose.uri);
+//mongoose.connect(config.mongoose.uri);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

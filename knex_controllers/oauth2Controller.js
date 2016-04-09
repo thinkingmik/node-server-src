@@ -3,12 +3,13 @@ var fs = require('fs');
 var jwt = require('jsonwebtoken');
 var crypto = require('crypto');
 var Promise = require('bluebird');
-var User = require('../models/userModel');
-var Client = require('../models/clientModel');
-var Token = require('../models/tokenModel');
-var Code = require('../models/codeModel');
+var User = require('../models/userModel').User;
+var Client = require('../models/clientModel').Client;
+var Token = require('../models/tokenModel').Token;
+var Code = require('../models/codeModel').Code;
 var headerHelper = require('../utils/headerParser');
 var config = require('../configs/config');
+var knex = require('knex')(config.knex);
 var NotFoundError = require('../exceptions/notFoundError');
 var handleError = require('../utils/handleJsonResponse').Error;
 var handleSuccess = require('../utils/handleJsonResponse').Success;
@@ -23,9 +24,11 @@ server.serializeClient(function(client, callback) {
 
 // Register deserialization function
 server.deserializeClient(function(id, callback) {
-  Client.findOne({
+  Client.forge()
+  .where({
     id: id
   })
+  .fetch()
   .then(function(client) {
     return client;
   })
@@ -34,25 +37,26 @@ server.deserializeClient(function(id, callback) {
 
 // Exchange credentials for authorization code (authorization code grant)
 server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, /*req,*/ callback) {
-  var newCode = new Code({
-    id: uid(8),
+  Code.forge({
+    code: uid(8),
     redirectUri: redirectUri,
     clientId: client.get('id'),
     userId: user.get('id')
-  });
-
-  newCode.save()
+  })
+  .save()
   .then(function(code) {
-    return code;
+    return code.get('code');
   })
   .nodeify(callback);
 }));
 
 // Exchange authorization code for access token (authorization code grant)
 server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, /*req,*/ callback) {
-  Code.findOne({
-    id: code
+  Code.forge()
+  .where({
+    code: code
   })
+  .fetch()
   .bind({})
   .then(function(authCode) {
     this.authCode = authCode;
@@ -65,7 +69,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, /*
     if (redirectUri !== this.authCode.get('redirectUri')) {
       throw new NotFoundError();
     }
-    return this.authCode.remove();
+    return this.authCode.destroy();
   })
   .then(function(ret) {
     return createTokens(client, this.authCode.get('userId')/*, req*/);
@@ -85,9 +89,11 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, /*
 
 // Exchange credentials for access token (resource owner password credentials grant)
 server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, /*req,*/ callback) {
-  User.findOne({
+  User.forge()
+  .where({
     username: username
   })
+  .fetch()
   .bind({})
   .then(function(user) {
     this.user = user;
@@ -119,22 +125,26 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
 
 // Exchange refresh token with new access token (refresh token grant)
 server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, /*req,*/ callback) {
-  Token.findOne({
+  Token.forge()
+  .where({
     refresh: refreshToken
   })
+  .fetch()
   .bind({})
   .then(function(token) {
     this.token = token;
     if (!token) {
       throw new NotFoundError();
     }
-    return User.findOne({
-      id: this.token.get('userId')
-    });
+    return User.forge()
+      .where({
+        id: this.token.get('userId')
+      })
+      .fetch();
   })
   .then(function(user) {
     this.user = user;
-    return this.token.remove();
+    return this.token.destroy();
   })
   .then(function() {
     //TODO: wait for pull request on oauth2orize module
@@ -172,17 +182,22 @@ server.exchange(oauth2orize.exchange.clientCredentials(function(client, scope, /
 //Delete all tokens associated to the user
 var doLogout = function(req, res) {
   var token = headerHelper.getBearerToken(req);
-  Token.findOne({
-    id: token
+  Token.forge()
+  .where({
+    token: token
   })
+  .fetch()
   .then(function(token) {
     if (!token) {
       throw new NotFoundError();
     }
-    return Token.remove({
-      userId: token.get('userId'),
-      clientId: token.get('clientId')
-    });
+    return knex('tokens')
+      .where({
+        userId: token.get('userId'),
+        clientId: token.get('clientId')
+      })
+      .returning('id')
+      .del();
   })
   .then(function(ret) {
     handleSuccess(res, ret);
@@ -202,21 +217,20 @@ var createTokens = function(client, userId, req) {
     createJwtToken(client, userId, ipAddress, userAgent)
     .bind({})
     .then(function(guid) {
-      this.token =  new Token({
-        id: guid,
+      return Token.forge({
+        token: guid,
         refresh: uid(32),
         clientId: client.get('id'),
         userId: userId,
         ipAddress: ipAddress,
         userAgent: userAgent
-      });
-
-      return this.token.save();
+      })
+      .save();
     })
-    .then(function(ret) {
+    .then(function(token) {
       var obj = [
-        this.token.get('id'),
-        this.token.get('refresh'),
+        token.get('token'),
+        token.get('refresh'),
         { 'expires_in': config.tokenLife }
       ];
       resolve(obj);
@@ -276,9 +290,11 @@ var uid = function(len) {
 //User authorization endpoint
 exports.authorization = [
   server.authorization(function(clientId, redirectUri, callback) {
-    Client.findOne({
+    Client.forge()
+    .where({
       name: clientId
     })
+    .fetch()
     .then(function(client) {
       return [client, redirectUri];
     })

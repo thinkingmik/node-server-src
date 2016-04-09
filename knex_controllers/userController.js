@@ -1,8 +1,9 @@
-var User = require('../models/userModel');
-var Role = require('../models/roleModel');
+var User = require('../models/userModel').User;
+var Users = require('../models/userModel').Users;
+var Role = require('../models/roleModel').Role;
 //var UserRole = require('../models/userRole');
-var Permission = require('../models/permissionModel');
-var Resource = require('../models/resourceModel');
+var Permission = require('../models/permissionModel').Permission;
+var Resource = require('../models/resourceModel').Resource;
 //var UserPolicy = require('../models/userPolicy');
 var NotFoundError = require('../exceptions/notFoundError');
 var handleError = require('../utils/handleJsonResponse').Error;
@@ -12,13 +13,19 @@ var handleSuccess = require('../utils/handleJsonResponse').Success;
 var addUser = function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
+  var email = req.body.email;
+  var firstName = req.body.firstName;
+  var lastName = req.body.lastName;
 
-  var username = new User({
+  var user = new User({
     username: username,
-    password: password
+    password: password,
+    email: email,
+    firstName: firstName,
+    lastName: lastName
   });
 
-  user.saveAsync()
+  user.save()
   .then(function(ret) {
     handleSuccess(res, ret);
   })
@@ -32,9 +39,11 @@ var getUser = function(req, res) {
   var userId = req.params.user;
 
   if (userId) {
-    User.findOne({
+    User.forge()
+    .where({
       id: userId
     })
+    .fetch()
     .then(function(ret) {
       handleSuccess(res, ret);
     })
@@ -49,7 +58,8 @@ var getUser = function(req, res) {
 
 //Get all users
 var getUsers = function(req, res) {
-  User.find()
+  Users.forge()
+  .fetch()
   .then(function(ret) {
     handleSuccess(res, ret);
   })
@@ -60,11 +70,11 @@ var getUsers = function(req, res) {
 
 //Delete an user by id
 var delUser = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
 
-  if (idUser) {
-    User.removeAsync({
-      _id: idUser
+  if (userId) {
+    User.remove({
+      id: userId
     })
     .then(function(ret) {
       handleSuccess(res, ret);
@@ -77,14 +87,14 @@ var delUser = function(req, res) {
 
 //Add a role to an user
 var addUserRole = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idRole = req.body.role;
   var main = req.body.main;
   var expiration = req.body.expiration;
   var description = req.body.description;
 
   var userRole = new UserRole({
-    _user: idUser,
+    _user: userId,
     _role: idRole,
     main: main,
     expiration: expiration,
@@ -102,12 +112,12 @@ var addUserRole = function(req, res) {
 
 //Remove a role by id associated to an user
 var delUserRole = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idRole = req.params.role;
 
   if (idRole) {
     UserRole.removeAsync({
-      _user: idUser,
+      _user: userId,
       _role: idRole
     })
     .then(function(ret) {
@@ -124,10 +134,10 @@ var delUserRole = function(req, res) {
 
 //Remove all roles associated to an user
 var delUserRoles = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
 
   UserRole.removeAsync({
-    _user: idUser
+    _user: userId
   })
   .then(function(ret) {
     handleSuccess(res, ret);
@@ -139,12 +149,12 @@ var delUserRoles = function(req, res) {
 
 //Get a role by id associated to an user
 var getUserRole = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idRole = req.params.role;
 
   if (idRole) {
     UserRole.findOne({
-      _user: idUser,
+      _user: userId,
       _role: idRole,
     })
     .populate('_role')
@@ -162,10 +172,10 @@ var getUserRole = function(req, res) {
 
 //Get all roles associated to an user
 var getUserRoles = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
 
   UserRole.find({
-    _user: idUser
+    _user: userId
   })
   .populate('_role')
   .then(function(ret) {
@@ -178,14 +188,14 @@ var getUserRoles = function(req, res) {
 
 //Add a policy to an user
 var addUserPolicy = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idRes = req.body.resource;
   var idPerm = req.body.permission;
   var description = req.body.description;
   var expiration = req.body.expiration;
 
   var userPolicy = new UserPolicy({
-    _user: idUser,
+    _user: userId,
     _resource: idRes,
     _permission: idPerm,
     description: description,
@@ -203,7 +213,7 @@ var addUserPolicy = function(req, res) {
 
 //Remove a policy by id associated to an user
 var delUserPolicy = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idRes = req.params.resource;
   var idPerm = req.params.permission;
 
@@ -213,7 +223,7 @@ var delUserPolicy = function(req, res) {
 
   if (idRes && idPerm) {
     UserPolicy.removeAsync({
-      _user: idUser,
+      _user: userId,
       _resource: idRes,
       _permission: idPerm
     })
@@ -237,10 +247,10 @@ var delUserPolicy = function(req, res) {
 
 //Remove all policies associated to an user
 var delUserPolicies = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
 
   UserPolicy.removeAsync({
-    _user: idUser
+    _user: userId
   })
   .then(function(ret) {
     handleSuccess(res, ret);
@@ -252,11 +262,11 @@ var delUserPolicies = function(req, res) {
 
 //Remove all resources associated to an user
 var delUserResources = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idRes = req.params.resource;
 
   UserPolicy.removeAsync({
-    _user: idUser,
+    _user: userId,
     _resource: idRes
   })
   .then(function(ret) {
@@ -269,11 +279,11 @@ var delUserResources = function(req, res) {
 
 //Remove all permissions associated to an user
 var delUserPermissions = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idPerm = req.params.permission;
 
   UserPolicy.removeAsync({
-    _user: idUser,
+    _user: userId,
     _permission: idPerm
   })
   .then(function(ret) {
@@ -286,7 +296,7 @@ var delUserPermissions = function(req, res) {
 
 //Get a policy by id associated to an user
 var getUserPolicy = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idRes = req.params.resource;
   var idPerm = req.params.permission;
 
@@ -296,7 +306,7 @@ var getUserPolicy = function(req, res) {
 
   if (idRes && idPerm) {
     UserPolicy.findOne({
-      _user: idUser,
+      _user: userId,
       _resource: idRes,
       _permission: idPerm
     })
@@ -321,10 +331,10 @@ var getUserPolicy = function(req, res) {
 
 //Get all policies associated to an user
 var getUserPolicies = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
 
   UserPolicy.find({
-    _user: idUser
+    _user: userId
   })
   .populate(['_resource', '_permission'])
   .then(function(ret) {
@@ -337,11 +347,11 @@ var getUserPolicies = function(req, res) {
 
 //Get all resources associated to an user
 var getUserResources = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idRes = req.params.resource;
 
   UserPolicy.find({
-    _user: idUser,
+    _user: userId,
     _resource: idRes
   })
   .populate(['_resource', '_permission'])
@@ -355,11 +365,11 @@ var getUserResources = function(req, res) {
 
 //Get all permissions associated to an user
 var getUserPermissions = function(req, res) {
-  var idUser = req.params.user;
+  var userId = req.params.user;
   var idPerm = req.params.permission;
 
   UserPolicy.find({
-    _user: idUser,
+    _user: userId,
     _permission: idPerm
   })
   .populate(['_resource', '_permission'])
