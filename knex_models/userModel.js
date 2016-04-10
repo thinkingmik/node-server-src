@@ -7,6 +7,7 @@ var Token = require('./tokenModel').Token;
 var Code = require('./codeModel').Code;
 var Role = require('./roleModel').Role;
 var UserRole = require('./userRoleModel').UserRole;
+var Policy = require('./policyModel').Policy;
 
 var User = bookshelf.Model.extend({
   tableName: 'users',
@@ -19,6 +20,9 @@ var User = bookshelf.Model.extend({
   },
   roles: function() {
     return this.hasMany(UserRole, 'userId');
+  },
+  policies: function() {
+    return this.hasMany(Policy, 'userId');
   },
   initialize: function () {
     this.on('creating', function (model) {

@@ -4,9 +4,10 @@
   "description": "Boilerplate for a node APIs server with OAuth2 support and ACL implementation",
   "main": "server.js",
   "scripts": {
+    "seeds": "node ./knex/seeds.js",
+    "create": "node ./knex/create.js",
     "drop": "node ./knex/drop.js",
-    "migrate": "node ./knex/start.js",
-    "initdb": "npm run migrate",
+    "initdb": "npm run drop & npm run create & npm run seeds",
     "test": "make test",
     "start": "node server.js"
   },

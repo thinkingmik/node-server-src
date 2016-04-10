@@ -97,19 +97,19 @@ describe('Client Credentials', function() {
 describe('Authorization Code', function() {
   it('should return an unsupported grant type', function(done) {
     api.get('/oauth2/authorize?client_id=client&response_type=fake&redirect_uri=http://localhost:3000')
-      .auth('user', 'user123')
+      .auth('admin', 'admin123')
       .expect(501)
       .end(done);
   });
   it('should return a bad request (missing parameters)', function(done) {
     api.get('/oauth2/authorize')
-      .auth('user', 'user123')
+      .auth('admin', 'admin123')
       .expect(400)
       .end(done);
   });
   it('should return a web page dialog', function(done) {
     api.get('/oauth2/authorize?client_id=client&response_type=code&redirect_uri=http://localhost:3000')
-      .auth('user', 'user123')
+      .auth('admin', 'admin123')
       .expect(200)
       .expect(function(res) {
         var $ = cheerio.load(res.text);
@@ -120,7 +120,7 @@ describe('Authorization Code', function() {
   });
   it('should redirect to the defined URI with an access denied error', function(done) {
     api.post('/oauth2/authorize')
-      .auth('user', 'user123')
+      .auth('admin', 'admin123')
       .set('Accept', 'application/x-www-form-urlencoded')
       .set('Cookie', cookie)
       .send({
@@ -136,7 +136,7 @@ describe('Authorization Code', function() {
   });
   it('should redirect to the defined URI with a code to exchange', function(done) {
     api.get('/oauth2/authorize?client_id=client&response_type=code&redirect_uri=http://localhost:3000')
-      .auth('user', 'user123')
+      .auth('admin', 'admin123')
       .expect(200)
       .expect(function(res) {
         var $ = cheerio.load(res.text);
@@ -145,7 +145,7 @@ describe('Authorization Code', function() {
       })
       .end(function(err, res) {
         api.post('/oauth2/authorize')
-          .auth('user', 'user123')
+          .auth('admin', 'admin123')
           .set('Accept', 'application/x-www-form-urlencoded')
           .set('Cookie', cookie)
           .send({
@@ -195,8 +195,8 @@ describe('User Credentials (behind proxy, no client secret)', function() {
       .send({
         grant_type: 'password_fake',
         client_id: 'client',
-        username: 'user',
-        password: 'user123',
+        username: 'admin',
+        password: 'admin123',
         scope: '*'
       })
       .set('Accept', 'application/x-www-form-urlencoded')
@@ -208,8 +208,8 @@ describe('User Credentials (behind proxy, no client secret)', function() {
       .send({
         grant_type: 'password',
         client_id: 'fake',
-        username: 'user',
-        password: 'user123',
+        username: 'admin',
+        password: 'admin123',
         scope: '*'
       })
       .set('Accept', 'application/x-www-form-urlencoded')
@@ -221,8 +221,8 @@ describe('User Credentials (behind proxy, no client secret)', function() {
       .send({
         grant_type: 'password',
         client_id: 'client',
-        username: 'user',
-        password: 'user123',
+        username: 'admin',
+        password: 'admin123',
         scope: '*'
       })
       .set('Accept', 'application/x-www-form-urlencoded')
@@ -258,8 +258,8 @@ describe('User Credentials', function() {
       .auth('client', 'client123')
       .send({
         grant_type: 'password_fake',
-        username: 'user',
-        password: 'user123',
+        username: 'admin',
+        password: 'admin123',
         scope: '*'
       })
       .set('Accept', 'application/x-www-form-urlencoded')
@@ -271,7 +271,7 @@ describe('User Credentials', function() {
       .auth('client', 'client1234')
       .send({
         grant_type: 'password',
-        username: 'user',
+        username: 'admin',
         password: 'user1234',
         scope: '*'
       })
@@ -284,8 +284,8 @@ describe('User Credentials', function() {
       .auth('client', 'client123')
       .send({
         grant_type: 'password',
-        username: 'user',
-        password: 'user123',
+        username: 'admin',
+        password: 'admin123',
         scope: '*'
       })
       .set('Accept', 'application/x-www-form-urlencoded')
@@ -306,8 +306,8 @@ describe('User Credentials', function() {
         grant_type: 'password',
         client_id: 'client',
         client_secret: 'client123',
-        username: 'user',
-        password: 'user123',
+        username: 'admin',
+        password: 'admin123',
         scope: '*'
       })
       .set('Accept', 'application/x-www-form-urlencoded')
@@ -344,8 +344,8 @@ describe('Refresh Token', function() {
         grant_type: 'password',
         client_id: 'client',
         client_secret: 'client123',
-        username: 'user',
-        password: 'user123',
+        username: 'admin',
+        password: 'admin123',
         scope: '*'
       })
       .set('Accept', 'application/x-www-form-urlencoded')
@@ -397,13 +397,13 @@ describe('Refresh Token', function() {
 describe('Basic Authentication', function() {
   it('should return a success message', function(done) {
     api.get(usersEndpoint)
-      .auth('user', 'user123')
+      .auth('admin', 'admin123')
       .expect(200)
       .end(done);
   });
   it('should return an unauthorized code', function(done) {
     api.get(usersEndpoint)
-      .auth('user', 'user1234')
+      .auth('admin', 'user1234')
       .expect(401)
       .end(done);
   });
