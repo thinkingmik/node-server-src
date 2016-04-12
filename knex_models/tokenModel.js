@@ -13,7 +13,7 @@ var Token = bookshelf.Model.extend({
   client: function() {
     return this.belongsTo(Client, 'id');
   },
-  destroyAll: function (clause, trx) {
+  removeBy: function (clause, trx) {
     return knex(this.tableName)
       .where(clause)
       .transacting(trx || {})

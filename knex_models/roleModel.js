@@ -7,7 +7,7 @@ var Policy = require('./policyModel').Policy;
 var Role = bookshelf.Model.extend({
   tableName: 'roles',
   hasTimestamps: ['createdAt', 'updatedAt'],
-  users: function() {
+  usersRoles: function() {
     return this.hasMany(UserRole, 'roleId');
   },
   policies: function() {

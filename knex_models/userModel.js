@@ -18,7 +18,7 @@ var User = bookshelf.Model.extend({
   codes: function() {
     return this.hasMany(Code, 'userId');
   },
-  roles: function() {
+  usersRoles: function() {
     return this.hasMany(UserRole, 'userId');
   },
   policies: function() {

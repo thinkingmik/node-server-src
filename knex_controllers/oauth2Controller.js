@@ -190,7 +190,7 @@ var doLogout = function(req, res) {
     if (!token) {
       throw new NotFoundError();
     }
-    return token.destroyAll({
+    return token.removeBy({
         userId: token.get('userId'),
         clientId: token.get('clientId')
       });
