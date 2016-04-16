@@ -8,10 +8,10 @@ var permissionController = require('../controllers/permissionController');
 var router = express.Router();
 
 router.route('/users')
-  .post(authMiddleware.isAuthenticated, userController.createUser);
+  .post(authMiddleware.isAuthenticated, aclMiddleware.isAllowed('USERS'), userController.createUser);
 router.route('/users/:user?')
-  .delete(authMiddleware.isAuthenticated, userController.deleteUser)
-  .get(authMiddleware.isAuthenticated, aclMiddleware.isAllowed('USERS', 'GET'), userController.getUser);
+  .delete(authMiddleware.isAuthenticated, aclMiddleware.isAllowed('USERS'), userController.deleteUser)
+  .get(authMiddleware.isAuthenticated, aclMiddleware.isAllowed('USERS'), userController.getUser);
 
 router.route('/users/:user/roles')
   .post(authMiddleware.isAuthenticated, userController.addUserRole);

@@ -153,6 +153,26 @@ var promise = new Promise(function(resolve, reject) {
   .save();
 })
 .then(function() {
+  console.log('[SEED] Inserting new policy');
+  return Policy.forge({
+    userId: 2,
+    roleId: null,
+    resourceId: 'CLIENTS',
+    permissionId: 'GET'
+  })
+  .save();
+})
+.then(function() {
+  console.log('[SEED] Inserting new policy');
+  return Policy.forge({
+    userId: null,
+    roleId: 2,
+    resourceId: 'CLIENTS',
+    permissionId: 'POST'
+  })
+  .save();
+})
+.then(function() {
   console.log('[OK] Seed all tables with success!');
   process.exit(0);
 })

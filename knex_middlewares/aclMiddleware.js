@@ -4,38 +4,27 @@ var Token = require('../models/tokenModel').Token;
 var Policy = require('../models/policyModel').Policy;
 var UserRole = require('../models/userRoleModel').UserRole;
 var NotFoundError = require('../exceptions/notFoundError');
+var AclNotFoundError = require('../exceptions/aclNotFoundError');
 var headerHelper = require('../utils/headerParser');
 
 var isAllowed = function(resource, permission) {
   return function(req, res, callback) {
+    if (!permission) {
+      permission = req.method;
+    }
+
     getUserId(req)
-    .bind({})
     .then(function(userId) {
-      this.userId = userId;
-      return UserRole.forge().query(function(qb) {
-      	qb.where(function() {
-      		this.where('userId', '=', this.userId);
-      	}).andWhere(function() {
-      		this.whereNull('expiration').orWhere('expiration', '>', '2016-04-16');
-      	});
-      })
-      .fetch({
-        columns: ['roleId']
-      })
-    })
-    .then(function(roles) {
-      return Policy.forge().query(function(qb) {
-      	qb.where(function() {
-      		this.where('userId', '=', this.userId).orWhereIn('roleId', [])
-      	}).andWhere(function() {
-          this.whereNull('expiration').orWhere('expiration', '>', '2016-04-16');
-      	});
-      })
-      .fetch();
+      return Policy.forge().fetchAllByUserId(userId);
     })
     .then(function(policies) {
-      //console.log(policies.length);
-      return callback(null, policies);
+      for (var key in policies) {
+        var policy = policies[key];
+        if (policy.get('resourceId').toLowerCase() === resource.toLowerCase() && policy.get('permissionId').toLowerCase() === permission.toLowerCase()) {
+          return callback(null, true);
+        }
+      }
+      throw new AclNotFoundError();
     })
     .catch(function(err) {
       return callback(err);
