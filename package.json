@@ -4,10 +4,10 @@
   "description": "Boilerplate for a node APIs server with OAuth2 support and ACL implementation",
   "main": "server.js",
   "scripts": {
-    "seeds": "node ./knex/seeds.js",
-    "create": "node ./knex/create.js",
-    "drop": "node ./knex/drop.js",
-    "initdb": "npm run drop & npm run create & npm run seeds",
+    "seeds": "node ./knex/seedTables.js",
+    "create": "node ./knex/createTables.js",
+    "drop": "node ./knex/dropTables.js",
+    "initdb": "npm run drop && npm run create && npm run seeds",
     "test": "make test",
     "start": "node server.js"
   },
@@ -31,7 +31,7 @@
   "dependencies": {
     "auto-loader": "^0.2.0",
     "bcrypt-nodejs": "0.0.3",
-    "bluebird": "^3.3.4",
+    "bluebird": "^3.3.5",
     "body-parser": "~1.14.2",
     "bookshelf": "^0.9.4",
     "cookie-parser": "~1.4.1",

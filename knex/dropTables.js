@@ -1,45 +1,47 @@
+var Promise = require('bluebird');
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
 
 knex.raw('')
 .then(function() {
-  console.log('[codes] Dropping table');
+  console.log('[DROP] Dropping table codes');
   return knex.schema.dropTableIfExists('codes');
 })
 .then(function() {
-  console.log('[tokens] Dropping table');
+  console.log('[DROP] Dropping table tokens');
   return knex.schema.dropTableIfExists('tokens');
 })
 .then(function() {
-  console.log('[policies] Dropping table');
+  console.log('[DROP] Dropping table policies');
   return knex.schema.dropTableIfExists('policies');
 })
 .then(function() {
-  console.log('[permissions] Dropping table');
+  console.log('[DROP] Dropping table permissions');
   return knex.schema.dropTableIfExists('permissions');
 })
 .then(function() {
-  console.log('[resources] Dropping table');
+  console.log('[DROP] Dropping table resources');
   return knex.schema.dropTableIfExists('resources');
 })
 .then(function() {
-  console.log('[clients] Dropping table');
+  console.log('[DROP] Dropping table clients');
   return knex.schema.dropTableIfExists('clients');
 })
 .then(function() {
-  console.log('[usersRoles] Dropping table');
+  console.log('[DROP] Dropping table usersRoles');
   return knex.schema.dropTableIfExists('usersRoles');
 })
 .then(function() {
-  console.log('[roles] Dropping table');
+  console.log('[DROP] Dropping table roles');
   return knex.schema.dropTableIfExists('roles');
 })
 .then(function() {
-  console.log('[users] Dropping table');
+  console.log('[DROP] Dropping table users');
   return knex.schema.dropTableIfExists('users');
 })
 .then(function() {
   console.log('[OK] Dropped all tables with success!');
+  process.exit(0);
 })
 .catch(function(err) {
   console.log('[ERROR] ' + err);

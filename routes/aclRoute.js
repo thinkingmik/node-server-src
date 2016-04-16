@@ -11,7 +11,7 @@ router.route('/users')
   .post(authMiddleware.isAuthenticated, userController.createUser);
 router.route('/users/:user?')
   .delete(authMiddleware.isAuthenticated, userController.deleteUser)
-  .get(authMiddleware.isAuthenticated, userController.getUser);
+  .get(authMiddleware.isAuthenticated, aclMiddleware.isAllowed('USERS', 'GET'), userController.getUser);
 
 router.route('/users/:user/roles')
   .post(authMiddleware.isAuthenticated, userController.addUserRole);

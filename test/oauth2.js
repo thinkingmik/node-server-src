@@ -19,7 +19,7 @@ var cookie = null;
 describe('Client Credentials', function() {
   it('should return an unsupported grant type', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'client123')
+      .auth('dashboard', 'dashboard123')
       .send({
         grant_type: 'fake',
         scope: '*'
@@ -30,7 +30,7 @@ describe('Client Credentials', function() {
   });
   it('should return an unauthorized code', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'fake')
+      .auth('dashboard', 'fake')
       .send({
         grant_type: 'client_credentials',
         scope: '*'
@@ -41,7 +41,7 @@ describe('Client Credentials', function() {
   });
   it('should return an access token (with basic authentication)', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'client123')
+      .auth('dashboard', 'dashboard123')
       .send({
         grant_type: 'client_credentials',
         scope: '*'
@@ -60,11 +60,11 @@ describe('Client Credentials', function() {
   });
   it('should return an access token', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'client123')
+      .auth('dashboard', 'dashboard123')
       .send({
         grant_type: 'client_credentials',
-        client_id: 'client',
-        client_secret: 'client123',
+        client_id: 'dashboard',
+        client_secret: 'dashboard123',
         scope: '*'
       })
       .set('Accept', 'application/x-www-form-urlencoded')
@@ -108,7 +108,7 @@ describe('Authorization Code', function() {
       .end(done);
   });
   it('should return a web page dialog', function(done) {
-    api.get('/oauth2/authorize?client_id=client&response_type=code&redirect_uri=http://localhost:3000')
+    api.get('/oauth2/authorize?client_id=dashboard&response_type=code&redirect_uri=http://localhost:3000')
       .auth('admin', 'admin123')
       .expect(200)
       .expect(function(res) {
@@ -135,7 +135,7 @@ describe('Authorization Code', function() {
       .end(done);
   });
   it('should redirect to the defined URI with a code to exchange', function(done) {
-    api.get('/oauth2/authorize?client_id=client&response_type=code&redirect_uri=http://localhost:3000')
+    api.get('/oauth2/authorize?client_id=dashboard&response_type=code&redirect_uri=http://localhost:3000')
       .auth('admin', 'admin123')
       .expect(200)
       .expect(function(res) {
@@ -162,7 +162,7 @@ describe('Authorization Code', function() {
   });
   it('should return an access token', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'client123')
+      .auth('dashboard', 'dashboard123')
       .send({
         grant_type: 'authorization_code',
         code: code,
@@ -194,7 +194,7 @@ describe('User Credentials (behind proxy, no client secret)', function() {
     api.post(tokenEndpoint)
       .send({
         grant_type: 'password_fake',
-        client_id: 'client',
+        client_id: 'dashboard',
         username: 'admin',
         password: 'admin123',
         scope: '*'
@@ -220,7 +220,7 @@ describe('User Credentials (behind proxy, no client secret)', function() {
     api.post(tokenEndpoint)
       .send({
         grant_type: 'password',
-        client_id: 'client',
+        client_id: 'dashboard',
         username: 'admin',
         password: 'admin123',
         scope: '*'
@@ -255,7 +255,7 @@ describe('User Credentials (behind proxy, no client secret)', function() {
 describe('User Credentials', function() {
   it('should return an unsupported grant type', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'client123')
+      .auth('dashboard', 'dashboard123')
       .send({
         grant_type: 'password_fake',
         username: 'admin',
@@ -268,7 +268,7 @@ describe('User Credentials', function() {
   });
   it('should return an unauthorized code', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'client1234')
+      .auth('dashboard', 'client1234')
       .send({
         grant_type: 'password',
         username: 'admin',
@@ -281,7 +281,7 @@ describe('User Credentials', function() {
   });
   it('should return an access token (with basic authentication)', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'client123')
+      .auth('dashboard', 'dashboard123')
       .send({
         grant_type: 'password',
         username: 'admin',
@@ -304,8 +304,8 @@ describe('User Credentials', function() {
     api.post(tokenEndpoint)
       .send({
         grant_type: 'password',
-        client_id: 'client',
-        client_secret: 'client123',
+        client_id: 'dashboard',
+        client_secret: 'dashboard123',
         username: 'admin',
         password: 'admin123',
         scope: '*'
@@ -342,8 +342,8 @@ describe('Refresh Token', function() {
     api.post(tokenEndpoint)
       .send({
         grant_type: 'password',
-        client_id: 'client',
-        client_secret: 'client123',
+        client_id: 'dashboard',
+        client_secret: 'dashboard123',
         username: 'admin',
         password: 'admin123',
         scope: '*'
@@ -356,7 +356,7 @@ describe('Refresh Token', function() {
       })
       .end(function(err, res) {
         api.post(tokenEndpoint)
-          .auth('client', 'client123')
+          .auth('dashboard', 'dashboard123')
           .send({
             grant_type: 'refresh_token',
             refresh_token: refreshToken
@@ -382,7 +382,7 @@ describe('Refresh Token', function() {
   });
   it('should return an invalid refresh token error', function(done) {
     api.post(tokenEndpoint)
-      .auth('client', 'client123')
+      .auth('dashboard', 'dashboard123')
       .send({
         grant_type: 'refresh_token',
         refresh_token: 'fake'

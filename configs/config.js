@@ -3,7 +3,7 @@ module.exports = {
   tokenLife: 3600, //seconds
   port: 3000,
   jwt: {
-    enabled: true,
+    enabled: false,
     ipcheck: false,
     secretKey: 'SuperSecret',
     cert: null,

@@ -3,7 +3,7 @@ var knex = require('knex')(config.knex);
 
 knex.raw('')
 .then(function() {
-  console.log('[users] Creating table');
+  console.log('[CREATE] Creating table users');
   return knex.schema.createTable('users', function(table) {
     table.increments('id').primary();
     table.string('username', 50).notNullable().unique();
@@ -16,7 +16,7 @@ knex.raw('')
   });
 })
 .then(function() {
-  console.log('[roles] Creating table');
+  console.log('[CREATE] Creating table roles');
   return knex.schema.createTable('roles', function(table) {
     table.increments('id').primary();
     table.string('name', 50).notNullable().unique();
@@ -26,7 +26,7 @@ knex.raw('')
   });
 })
 .then(function() {
-  console.log('[usersRoles] Creating table');
+  console.log('[CREATE] Creating table usersRoles');
   return knex.schema.createTable('usersRoles', function(table) {
     table.increments('id').primary();
     table.bigInteger('userId').unsigned().index().references('id').inTable('users').onDelete('CASCADE').onUpdate('CASCADE');
@@ -39,7 +39,7 @@ knex.raw('')
   });
 })
 .then(function() {
-  console.log('[clients] Creating table');
+  console.log('[CREATE] Creating table clients');
   return knex.schema.createTable('clients', function(table) {
     table.increments('id').primary();
     table.string('name', 50).notNullable().unique();
@@ -51,7 +51,7 @@ knex.raw('')
   });
 })
 .then(function() {
-  console.log('[resources] Creating table');
+  console.log('[CREATE] Creating table resources');
   return knex.schema.createTable('resources', function(table) {
     table.string('id', 50).primary();
     table.string('description', 255).nullable();
@@ -60,7 +60,7 @@ knex.raw('')
   });
 })
 .then(function() {
-  console.log('[permissions] Creating table');
+  console.log('[CREATE] Creating table permissions');
   return knex.schema.createTable('permissions', function(table) {
     table.string('id', 50).primary();
     table.string('description', 255).nullable();
@@ -69,7 +69,7 @@ knex.raw('')
   });
 })
 .then(function() {
-  console.log('[policies] Creating table');
+  console.log('[CREATE] Creating table policies');
   return knex.schema.createTable('policies', function(table) {
     table.increments('id').primary();
     table.bigInteger('userId').nullable().unsigned().index().references('id').inTable('users').onDelete('SET NULL').onUpdate('CASCADE');
@@ -83,7 +83,7 @@ knex.raw('')
   });
 })
 .then(function() {
-  console.log('[tokens] Creating table');
+  console.log('[CREATE] Creating table tokens');
   return knex.schema.createTable('tokens', function(table) {
     table.increments('id').primary();
     table.string('token', 1024).notNullable().unique();
@@ -96,7 +96,7 @@ knex.raw('')
   });
 })
 .then(function() {
-  console.log('[codes] Creating table');
+  console.log('[CREATE] Creating table codes');
   return knex.schema.createTable('codes', function(table) {
     table.increments('id').primary();
     table.string('code', 512).notNullable().unique();
@@ -108,6 +108,7 @@ knex.raw('')
 })
 .then(function() {
   console.log('[OK] Created all tables with success!');
+  process.exit(0);
 })
 .catch(function(err) {
   console.log('[ERROR] ' + err);
