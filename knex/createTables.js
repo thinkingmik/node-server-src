@@ -29,10 +29,11 @@ knex.raw('')
   console.log('[CREATE] Creating table usersRoles');
   return knex.schema.createTable('usersRoles', function(table) {
     table.increments('id').primary();
-    table.bigInteger('userId').unsigned().index().references('id').inTable('users').onDelete('CASCADE').onUpdate('CASCADE');
-    table.bigInteger('roleId').unsigned().index().references('id').inTable('roles').onDelete('SET NULL').onUpdate('CASCADE');
+    table.bigInteger('userId').unsigned().index().references('id').inTable('users').onDelete('NO ACTION').onUpdate('CASCADE');
+    table.bigInteger('roleId').unsigned().index().references('id').inTable('roles').onDelete('NO ACTION').onUpdate('CASCADE');
     table.unique(['userId', 'roleId']);
     table.boolean('main').defaultTo(false);
+    table.timestamp('activation').nullable();
     table.timestamp('expiration').nullable();
     table.timestamp('createdAt').notNullable().defaultTo(knex.raw('now()'));
     table.timestamp('updatedAt').notNullable().defaultTo(knex.raw('now()'));
@@ -72,11 +73,12 @@ knex.raw('')
   console.log('[CREATE] Creating table policies');
   return knex.schema.createTable('policies', function(table) {
     table.increments('id').primary();
-    table.bigInteger('userId').nullable().unsigned().index().references('id').inTable('users').onDelete('SET NULL').onUpdate('CASCADE');
-    table.bigInteger('roleId').nullable().unsigned().index().references('id').inTable('roles').onDelete('SET NULL').onUpdate('CASCADE');
+    table.bigInteger('userId').nullable().unsigned().index().references('id').inTable('users').onDelete('NO ACTION').onUpdate('CASCADE');
+    table.bigInteger('roleId').nullable().unsigned().index().references('id').inTable('roles').onDelete('NO ACTION').onUpdate('CASCADE');
     table.string('resourceId').notNullable().index().references('id').inTable('resources').onDelete('CASCADE').onUpdate('CASCADE');
     table.string('permissionId').notNullable().index().references('id').inTable('permissions').onDelete('CASCADE').onUpdate('CASCADE');
     table.unique(['userId', 'roleId', 'resourceId', 'permissionId']);
+    table.timestamp('activation').nullable();
     table.timestamp('expiration').nullable();
     table.timestamp('createdAt').notNullable().defaultTo(knex.raw('now()'));
     table.timestamp('updatedAt').notNullable().defaultTo(knex.raw('now()'));
@@ -107,7 +109,6 @@ knex.raw('')
   });
 })
 .then(function() {
-  console.log('[OK] Created all tables with success!');
   process.exit(0);
 })
 .catch(function(err) {

@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var moment = require('moment');
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
 var bookshelf = require('bookshelf')(knex);
@@ -27,6 +28,7 @@ var Policy = bookshelf.Model.extend({
     var usersRolesTable = UserRole.forge().tableName;
     var policiesTable = this.tableName;
     return new Promise(function(resolve, reject) {
+      var nowdate = moment().format();
       knex.select(policiesTable + '.*')
       .from(policiesTable)
       .leftJoin(usersRolesTable, usersRolesTable + '.roleId', policiesTable + '.roleId')
@@ -34,25 +36,23 @@ var Policy = bookshelf.Model.extend({
       	this.where(policiesTable + '.userId', '=', userId).orWhere(usersRolesTable + '.userId', '=', userId)
       })
       .andWhere(function() {
-      	this.whereNull(usersRolesTable + '.expiration').orWhere(usersRolesTable + '.expiration', '>', knex.CURRENT_TIMESTAMP);
+        this.whereNull(usersRolesTable + '.activation').orWhere(usersRolesTable + '.activation', '<=', nowdate);
       })
       .andWhere(function() {
-      	this.whereNull(policiesTable + '.expiration').orWhere(policiesTable + '.expiration', '>', knex.CURRENT_TIMESTAMP);
+      	this.whereNull(usersRolesTable + '.expiration').orWhere(usersRolesTable + '.expiration', '>', nowdate);
+      })
+      .andWhere(function() {
+      	this.whereNull(policiesTable + '.activation').orWhere(policiesTable + '.activation', '<=', nowdate);
+      })
+      .andWhere(function() {
+      	this.whereNull(policiesTable + '.expiration').orWhere(policiesTable + '.expiration', '>', nowdate);
       })
       .then(function(res) {
         var policies = [];
         for (var key in res) {
           var raw = res[key];
-          var policy = Policy.forge({
-            id: raw.id,
-            userId: raw.userId,
-            roleId: raw.roleId,
-            resourceId: raw.resourceId,
-            permissionId: raw.permissionId,
-            expiration: raw.expiration,
-            createdAt: raw.createdAt,
-            updatedAt: raw.updatedAt
-          });
+          console.log(raw);
+          var policy = Policy.forge(raw);
           policies.push(policy);
         }
         resolve(policies);

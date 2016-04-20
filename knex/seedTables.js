@@ -173,7 +173,6 @@ var promise = new Promise(function(resolve, reject) {
   .save();
 })
 .then(function() {
-  console.log('[OK] Seed all tables with success!');
   process.exit(0);
 })
 .catch(function(err) {

@@ -43,6 +43,7 @@
     "jade": "~1.11.0",
     "jsonwebtoken": "^5.7.0",
     "knex": "^0.10.0",
+    "moment": "^2.13.0",
     "mongoose": "^4.4.12",
     "morgan": "~1.6.1",
     "oauth2orize": "^1.0.1",

@@ -40,7 +40,6 @@ knex.raw('')
   return knex.schema.dropTableIfExists('users');
 })
 .then(function() {
-  console.log('[OK] Dropped all tables with success!');
   process.exit(0);
 })
 .catch(function(err) {
