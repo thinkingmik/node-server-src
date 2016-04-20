@@ -13,7 +13,7 @@ var getToken = function(req) {
   var auth = req.headers['authorization'];
 
   if (req && auth) {
-    token = auth.replace('Bearer', '').trim();
+    token = auth.replace(/bearer/ig, '').trim();
   }
 
   return token;
@@ -23,8 +23,8 @@ var getBasicAuth = function(req) {
   var credentials = null;
   var auth = req.headers['authorization'];
 
-  if (req && auth && auth.indexOf('Basic') >= 0) {
-    var b64Credentials = auth.replace('Basic', '').trim();
+  if (req && auth && (auth.indexOf('Basic') >= 0 || auth.indexOf('basic') >= 0 || auth.indexOf('BASIC') >= 0)) {
+    var b64Credentials = auth.replace(/basic/ig, '').trim();
     var buf = new Buffer(b64Credentials, 'base64');
     var temp = buf.toString().split(':');
 
