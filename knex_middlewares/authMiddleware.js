@@ -17,7 +17,8 @@ passport.use('basic', new BasicStrategy(
   function(username, password, callback) {
     User.forge()
     .where({
-      username: username
+      username: username,
+      enabled: true
     })
     .fetch()
     .bind({})
@@ -53,7 +54,8 @@ passport.use('client-basic', new BasicStrategy(
   function(clientId, clientSecret, callback) {
     Client.forge()
     .where({
-      name: clientId
+      name: clientId,
+      enabled: true
     })
     .fetch()
     .bind({})
@@ -71,7 +73,8 @@ passport.use('client-basic', new BasicStrategy(
 passport.use('client-password', new ClientPasswordStrategy(
   function(clientId, clientSecret, callback) {
     Client.forge().where({
-      name: clientId
+      name: clientId,
+      enabled: true
     })
     .fetch()
     .bind({})
@@ -125,14 +128,16 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
       if (this.token.get('userId') != null) {
         return User.forge()
           .where({
-            id: this.token.get('userId')
+            id: this.token.get('userId'),
+            enabled: true
           })
           .fetch();
       }
       else {
         return Client.forge()
           .where({
-            id: this.token.get('clientId')
+            id: this.token.get('clientId'),
+            enabled: true
           })
           .fetch();
       }

@@ -25,7 +25,8 @@ server.serializeClient(function(client, callback) {
 server.deserializeClient(function(id, callback) {
   Client.forge()
   .where({
-    id: id
+    id: id,
+    enabled: true
   })
   .fetch()
   .then(function(client) {
@@ -90,7 +91,8 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, /*
 server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, /*req,*/ callback) {
   User.forge()
   .where({
-    username: username
+    username: username,
+    enabled: true
   })
   .fetch()
   .bind({})
@@ -137,12 +139,16 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
     }
     return User.forge()
       .where({
-        id: this.token.get('userId')
+        id: this.token.get('userId'),
+        enabled: true
       })
       .fetch();
   })
   .then(function(user) {
     this.user = user;
+    if (!this.user) {
+      throw new NotFoundError();
+    }
     return this.token.destroy();
   })
   .then(function() {
@@ -201,6 +207,10 @@ var doLogout = function(req, res) {
   .catch(function(err) {
     handleError(res, err);
   });
+}
+
+var test = function(req, res) {
+  handleSuccess(res, true);
 }
 
 // Create access token (jwt if enabled) and refresh token by client and user id
@@ -288,7 +298,8 @@ exports.authorization = [
   server.authorization(function(clientId, redirectUri, callback) {
     Client.forge()
     .where({
-      name: clientId
+      name: clientId,
+      enabled: true
     })
     .fetch()
     .then(function(client) {
@@ -318,3 +329,6 @@ exports.token = [
 
 //Logout endpoint
 exports.logout = doLogout;
+
+//Test endpoint
+exports.test = test;

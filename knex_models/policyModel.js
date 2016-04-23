@@ -25,6 +25,7 @@ var Policy = bookshelf.Model.extend({
     return this.belongsTo(Permission, 'id');
   },
   fetchAllByUserId: function(userId) {
+    var rolesTable = Role.forge().tableName;
     var usersRolesTable = UserRole.forge().tableName;
     var policiesTable = this.tableName;
     return new Promise(function(resolve, reject) {
@@ -32,8 +33,11 @@ var Policy = bookshelf.Model.extend({
       knex.select(policiesTable + '.*')
       .from(policiesTable)
       .leftJoin(usersRolesTable, usersRolesTable + '.roleId', policiesTable + '.roleId')
+      .leftJoin(rolesTable, rolesTable + '.id', usersRolesTable + '.roleId')
       .where(function() {
-      	this.where(policiesTable + '.userId', '=', userId).orWhere(usersRolesTable + '.userId', '=', userId)
+      	this.where(policiesTable + '.userId', '=', userId).orWhere(function() {
+          this.where(usersRolesTable + '.userId', '=', userId).andWhere(rolesTable + '.enabled', '=', true);
+        })
       })
       .andWhere(function() {
         this.whereNull(usersRolesTable + '.activation').orWhere(usersRolesTable + '.activation', '<=', nowdate);
@@ -51,7 +55,6 @@ var Policy = bookshelf.Model.extend({
         var policies = [];
         for (var key in res) {
           var raw = res[key];
-          console.log(raw);
           var policy = Policy.forge(raw);
           policies.push(policy);
         }

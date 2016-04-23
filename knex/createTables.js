@@ -11,6 +11,7 @@ knex.raw('')
     table.string('email', 100).notNullable().unique();
     table.string('firstName', 100).nullable();
     table.string('lastName', 100).nullable();
+    table.boolean('enabled').defaultTo(true);
     table.timestamp('createdAt').notNullable().defaultTo(knex.raw('now()'));
     table.timestamp('updatedAt').notNullable().defaultTo(knex.raw('now()'));
   });
@@ -21,6 +22,7 @@ knex.raw('')
     table.increments('id').primary();
     table.string('name', 50).notNullable().unique();
     table.string('description', 255).nullable();
+    table.boolean('enabled').defaultTo(true);
     table.timestamp('createdAt').notNullable().defaultTo(knex.raw('now()'));
     table.timestamp('updatedAt').notNullable().defaultTo(knex.raw('now()'));
   });
@@ -47,6 +49,7 @@ knex.raw('')
     table.string('secret', 255).notNullable().unique();
     table.string('description', 255).nullable();
     table.string('domain', 255).nullable();
+    table.boolean('enabled').defaultTo(true);
     table.timestamp('createdAt').notNullable().defaultTo(knex.raw('now()'));
     table.timestamp('updatedAt').notNullable().defaultTo(knex.raw('now()'));
   });

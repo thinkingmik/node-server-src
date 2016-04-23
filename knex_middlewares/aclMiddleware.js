@@ -15,6 +15,9 @@ var isAllowed = function(resource, permission) {
 
     getUserId(req)
     .then(function(userId) {
+      if (!userId) {
+        throw new AclNotFoundError();
+      }
       return Policy.forge().fetchAllByUserId(userId);
     })
     .then(function(policies) {
@@ -58,7 +61,8 @@ var getUserId = function(req) {
     else {
       User.forge()
       .where({
-        username: credentials['username']
+        username: credentials['username'],
+        enabled: true
       })
       .fetch()
       .bind({})

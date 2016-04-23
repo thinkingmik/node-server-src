@@ -16,4 +16,7 @@ router.route('/oauth2/token')
 router.route('/oauth2/logout')
   .post(authMiddleware.isAuthenticated, oauth2Controller.logout);
 
+router.route('/oauth2/test')
+  .get(authMiddleware.isAuthenticated, oauth2Controller.test)
+
 module.exports = router;

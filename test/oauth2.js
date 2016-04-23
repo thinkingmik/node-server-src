@@ -8,7 +8,7 @@ var supertest = require('supertest');
 var api = supertest('http://localhost:' + config.port);
 
 var tokenEndpoint = '/oauth2/token';
-var usersEndpoint = '/users';
+var testEndpoint = '/oauth2/test';
 var accessToken = '';
 var refreshToken = '';
 var transactionId = '';
@@ -16,7 +16,7 @@ var code = '';
 var cookie = null;
 
 // OAuth2 client credentials grant
-describe('Client Credentials', function() {
+describe('Do a client credentials authentication', function() {
   it('should return an unsupported grant type', function(done) {
     api.post(tokenEndpoint)
       .auth('dashboard', 'dashboard123')
@@ -80,13 +80,13 @@ describe('Client Credentials', function() {
       .end(done);
   });
   it('should return a success message', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .set('Authorization', 'bearer ' + accessToken)
       .expect(200)
       .end(done);
   });
   it('should return an invalid access token error', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .set('Authorization', 'bearer fake')
       .expect(401)
       .end(done);
@@ -94,7 +94,7 @@ describe('Client Credentials', function() {
 });
 
 // OAuth2 authorization code grant
-describe('Authorization Code', function() {
+describe('Do an authorization code authentication', function() {
   it('should return an unsupported grant type', function(done) {
     api.get('/oauth2/authorize?client_id=client&response_type=fake&redirect_uri=http://localhost:3000')
       .auth('admin', 'admin123')
@@ -181,7 +181,7 @@ describe('Authorization Code', function() {
       .end(done);
   });
   it('should return a success message', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .set('Authorization', 'bearer ' + accessToken)
       .expect(200)
       .end(done);
@@ -189,7 +189,7 @@ describe('Authorization Code', function() {
 });
 
 // OAuth2 resource owner password credentials grant with proxy
-describe('User Credentials (behind proxy, no client secret)', function() {
+describe('Do an user credentials authentication (behind proxy, no client secret)', function() {
   it('should return an unsupported grant type', function(done) {
     api.post(tokenEndpoint)
       .send({
@@ -238,13 +238,13 @@ describe('User Credentials (behind proxy, no client secret)', function() {
       .end(done);
   });
   it('should return a success message', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .set('Authorization', 'bearer ' + accessToken)
       .expect(200)
       .end(done);
   });
   it('should return an invalid access token error', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .set('Authorization', 'bearer fake')
       .expect(401)
       .end(done);
@@ -252,7 +252,7 @@ describe('User Credentials (behind proxy, no client secret)', function() {
 });
 
 // OAuth2 resource owner password credentials grant
-describe('User Credentials', function() {
+describe('Do an user credentials authentication', function() {
   it('should return an unsupported grant type', function(done) {
     api.post(tokenEndpoint)
       .auth('dashboard', 'dashboard123')
@@ -323,13 +323,13 @@ describe('User Credentials', function() {
       .end(done);
   });
   it('should return a success message', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .set('Authorization', 'bearer ' + accessToken)
       .expect(200)
       .end(done);
   });
   it('should return an invalid access token error', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .set('Authorization', 'bearer fake')
       .expect(401)
       .end(done);
@@ -337,7 +337,7 @@ describe('User Credentials', function() {
 });
 
 // OAuth2 refresh token grant
-describe('Refresh Token', function() {
+describe('Refreshing access token', function() {
   it('should return a new access token', function(done) {
     api.post(tokenEndpoint)
       .send({
@@ -375,7 +375,7 @@ describe('Refresh Token', function() {
       });
   });
   it('should return a success message', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .set('Authorization', 'bearer ' + accessToken)
       .expect(200)
       .end(done);
@@ -394,15 +394,15 @@ describe('Refresh Token', function() {
 });
 
 // Basic authentication
-describe('Basic Authentication', function() {
+describe('Do a basic authentication', function() {
   it('should return a success message', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .auth('admin', 'admin123')
       .expect(200)
       .end(done);
   });
   it('should return an unauthorized code', function(done) {
-    api.get(usersEndpoint)
+    api.get(testEndpoint)
       .auth('admin', 'user1234')
       .expect(401)
       .end(done);

@@ -15,7 +15,8 @@ var fillClientCredentials = function(req, res, callback) {
   if (clientId && !clientSecret && !isBasicAuth) {
     Client.forge()
     .where({
-      name: clientId
+      name: clientId,
+      enabled: true
     })
     .fetch()
     .then(function(client) {
