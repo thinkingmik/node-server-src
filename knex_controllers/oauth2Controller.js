@@ -3,10 +3,10 @@ var fs = require('fs');
 var jwt = require('jsonwebtoken');
 var crypto = require('crypto');
 var Promise = require('bluebird');
-var User = require('../models/userModel').User;
-var Client = require('../models/clientModel').Client;
-var Token = require('../models/tokenModel').Token;
-var Code = require('../models/codeModel').Code;
+var User = require('../models/userModel');
+var Client = require('../models/clientModel');
+var Token = require('../models/tokenModel');
+var Code = require('../models/codeModel');
 var headerHelper = require('../utils/headerParser');
 var config = require('../configs/config');
 var NotFoundError = require('../exceptions/notFoundError');
@@ -36,7 +36,7 @@ server.deserializeClient(function(id, callback) {
 });
 
 // Exchange credentials for authorization code (authorization code grant)
-server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, /*req,*/ callback) {
+server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, req, callback) {
   Code.forge({
     code: uid(8),
     redirectUri: redirectUri,
@@ -51,7 +51,7 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, /*
 }));
 
 // Exchange authorization code for access token (authorization code grant)
-server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, /*req,*/ callback) {
+server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, req, callback) {
   Code.forge()
   .where({
     code: code
@@ -72,7 +72,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, /*
     return this.authCode.destroy();
   })
   .then(function(ret) {
-    return createTokens(client, this.authCode.get('userId')/*, req*/);
+    return createTokens(client, this.authCode.get('userId'), req);
   })
   .nodeify(function(err, token, refresh, expires) {
     if (!err) {
@@ -88,7 +88,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, /*
 }));
 
 // Exchange credentials for access token (resource owner password credentials grant)
-server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, /*req,*/ callback) {
+server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, req, callback) {
   User.forge()
   .where({
     username: username,
@@ -109,7 +109,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
     }
   })
   .then(function() {
-    return createTokens(client, this.user.get('id')/*, req*/);
+    return createTokens(client, this.user.get('id'), req);
   })
   .nodeify(function(err, token, refresh, expires) {
     if (!err) {
@@ -125,7 +125,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
 }));
 
 // Exchange refresh token with new access token (refresh token grant)
-server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, /*req,*/ callback) {
+server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, req, callback) {
   Token.forge()
   .where({
     refresh: refreshToken
@@ -152,8 +152,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
     return this.token.destroy();
   })
   .then(function() {
-    //TODO: wait for pull request on oauth2orize module
-    return createTokens(client, this.user.get('id')/*, req*/);
+    return createTokens(client, this.user.get('id'), req);
   })
   .nodeify(function(err, token, refresh, expires) {
     if (!err) {
@@ -169,8 +168,8 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
 }));
 
 // Exchange credentials for access token (client credentials grant)
-server.exchange(oauth2orize.exchange.clientCredentials(function(client, scope, /*req,*/ callback) {
-  createTokens(client, null/*, req*/)
+server.exchange(oauth2orize.exchange.clientCredentials(function(client, scope, req, callback) {
+  createTokens(client, null, req)
   .spread(function(token, refresh, expiration) {
     callback(null, token, refresh, expiration);
   })
@@ -216,8 +215,8 @@ var test = function(req, res) {
 // Create access token (jwt if enabled) and refresh token by client and user id
 var createTokens = function(client, userId, req) {
   //TODO: wait for pull request on oauth2orize module
-  var ipAddress = null;//headerHelper.getIP(req);
-  var userAgent = null;//headerHelper.getUA(req);
+  var ipAddress = req.ipAddress;//headerHelper.getIP(req);
+  var userAgent = req.userAgent;//headerHelper.getUA(req);
 
   return new Promise(function(resolve, reject) {
     createJwtToken(client, userId, ipAddress, userAgent)
@@ -263,9 +262,7 @@ var createJwtToken = function(client, userId, ipAddress, userAgent) {
       'ipa': ipAddress,
       'bua': userAgent,
       'jti': uid(16),
-      'iat': createdAt,
-      'roles': [],
-      'policies': []
+      'iat': createdAt
     };
 
     if (config.jwt.cert != null) {

@@ -2,35 +2,36 @@ var Promise = require('bluebird');
 var moment = require('moment');
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
-var bookshelf = require('bookshelf')(knex);
-var User = require('./userModel').User;
-var Role = require('./roleModel').Role;
-var UserRole = require('./userRoleModel').UserRole;
-var Resource = require('./resourceModel').Resource;
-var Permission = require('./permissionModel').Permission;
+var Bookshelf = require('bookshelf')(knex);
+Bookshelf.plugin('registry');
+require('./userModel');
+require('./roleModel');
+require('./userRoleModel');
+require('./resourceModel');
+require('./permissionModel');
 
-var Policy = bookshelf.Model.extend({
+var Policy = Bookshelf.Model.extend({
   tableName: 'policies',
   hasTimestamps: ['createdAt', 'updatedAt'],
   user: function() {
-    return this.belongsTo(User, 'id');
+    return this.belongsTo('User', 'id');
   },
   role: function() {
-    return this.belongsTo(Role, 'id');
+    return this.belongsTo('Role', 'id');
   },
   resource: function() {
-    return this.belongsTo(Resource, 'id');
+    return this.belongsTo('Resource', 'id');
   },
   permission: function() {
-    return this.belongsTo(Permission, 'id');
+    return this.belongsTo('Permission', 'id');
   },
   fetchAllByUserId: function(userId) {
-    var rolesTable = Role.forge().tableName;
-    var usersRolesTable = UserRole.forge().tableName;
+    var rolesTable = 'roles';
+    var usersRolesTable = 'usersRoles';
     var policiesTable = this.tableName;
     return new Promise(function(resolve, reject) {
       var nowdate = moment().format();
-      knex.select(policiesTable + '.*')
+      Bookshelf.knex.select(policiesTable + '.*')
       .from(policiesTable)
       .leftJoin(usersRolesTable, usersRolesTable + '.roleId', policiesTable + '.roleId')
       .leftJoin(rolesTable, rolesTable + '.id', usersRolesTable + '.roleId')
@@ -67,9 +68,4 @@ var Policy = bookshelf.Model.extend({
   }
 });
 
-var Policies = bookshelf.Collection.extend({
-  model: Policy
-});
-
-module.exports.Policy = Policy;
-module.exports.Policies = Policies;
+module.exports = Bookshelf.model('Policy', Policy);

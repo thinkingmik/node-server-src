@@ -1,4 +1,6 @@
-var Client = require('../models/clientModel').Client;
+var headerHelper = require('../utils/headerParser');
+var config = require('../configs/config');
+var Client = require('../models/clientModel');
 var NotFoundError = require('../exceptions/notFoundError');
 
 var fillClientCredentials = function(req, res, callback) {
@@ -7,6 +9,11 @@ var fillClientCredentials = function(req, res, callback) {
   var clientSecret = req.body['client_secret'];
   var auth = req.headers['authorization'];
   var isBasicAuth = false;
+
+  if (config.jwt.enabled === true) {
+    req.body['userAgent'] = headerHelper.getUA(req);
+    req.body['ipAddress'] = headerHelper.getIP(req);
+  }
 
   if (auth != null && auth.indexOf('Basic') >= 0) {
     isBasicAuth = true;

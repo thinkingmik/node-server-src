@@ -1,23 +1,19 @@
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
-var bookshelf = require('bookshelf')(knex);
-var UserRole = require('./userRoleModel').UserRole;
-var Policy = require('./policyModel').Policy;
+var Bookshelf = require('bookshelf')(knex);
+Bookshelf.plugin('registry');
+require('./userRoleModel');
+require('./policyModel');
 
-var Role = bookshelf.Model.extend({
+var Role = Bookshelf.Model.extend({
   tableName: 'roles',
   hasTimestamps: ['createdAt', 'updatedAt'],
   usersRoles: function() {
-    return this.hasMany(UserRole, 'roleId');
+    return this.hasMany('UserRole', 'roleId');
   },
   policies: function() {
-    return this.hasMany(Policy, 'roleId');
+    return this.hasMany('Policy', 'roleId');
   }
 });
 
-var Roles = bookshelf.Collection.extend({
-  model: Role
-});
-
-module.exports.Role = Role;
-module.exports.Roles = Roles;
+module.exports = Bookshelf.model('Role', Role);

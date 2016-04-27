@@ -1,23 +1,19 @@
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
-var bookshelf = require('bookshelf')(knex);
-var Token = require('./tokenModel').Token;
-var Code = require('./codeModel').Code;
+var Bookshelf = require('bookshelf')(knex);
+Bookshelf.plugin('registry');
+require('./tokenModel');
+require('./codeModel');
 
-var Client = bookshelf.Model.extend({
+var Client = Bookshelf.Model.extend({
   tableName: 'clients',
   hasTimestamps: ['createdAt', 'updatedAt'],
   tokens: function() {
-    return this.hasMany(Token, 'clientId');
+    return this.hasMany('Token', 'clientId');
   },
   codes: function() {
-    return this.hasMany(Code, 'clientId');
+    return this.hasMany('Code', 'clientId');
   }
 });
 
-var Clients = bookshelf.Collection.extend({
-  model: Client
-});
-
-module.exports.Client = Client;
-module.exports.Clients = Clients;
+module.exports = Bookshelf.model('Client', Client);

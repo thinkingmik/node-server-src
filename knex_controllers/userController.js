@@ -1,9 +1,8 @@
-var User = require('../models/userModel').User;
-var Users = require('../models/userModel').Users;
-var Role = require('../models/roleModel').Role;
+var User = require('../models/userModel');
+var Role = require('../models/roleModel');
 //var UserRole = require('../models/userRole');
-var Permission = require('../models/permissionModel').Permission;
-var Resource = require('../models/resourceModel').Resource;
+var Permission = require('../models/permissionModel');
+var Resource = require('../models/resourceModel');
 //var UserPolicy = require('../models/userPolicy');
 var NotFoundError = require('../exceptions/notFoundError');
 var handleError = require('../utils/handleJsonResponse').Error;
@@ -58,7 +57,7 @@ var getUser = function(req, res) {
 
 //Get all users
 var getUsers = function(req, res) {
-  Users.forge()
+  User.collection()
   .fetch()
   .then(function(ret) {
     handleSuccess(res, ret);

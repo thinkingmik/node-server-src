@@ -1,19 +1,15 @@
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
-var bookshelf = require('bookshelf')(knex);
-var Policy = require('./policyModel').Policy;
+var Bookshelf = require('bookshelf')(knex);
+Bookshelf.plugin('registry');
+require('./policyModel');
 
-var Resource = bookshelf.Model.extend({
+var Resource = Bookshelf.Model.extend({
   tableName: 'resources',
   hasTimestamps: ['createdAt', 'updatedAt'],
   policies: function() {
-    return this.hasMany(Policy, 'resourceId');
+    return this.hasMany('Policy', 'resourceId');
   }
 });
 
-var Resources = bookshelf.Collection.extend({
-  model: Resources
-});
-
-module.exports.Resource = Resource;
-module.exports.Resources = Resources;
+module.exports = Bookshelf.model('Resource', Resource);

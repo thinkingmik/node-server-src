@@ -2,27 +2,28 @@ var Promise = require('bluebird');
 var bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'));
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
-var bookshelf = require('bookshelf')(knex);
-var Token = require('./tokenModel').Token;
-var Code = require('./codeModel').Code;
-var Role = require('./roleModel').Role;
-var UserRole = require('./userRoleModel').UserRole;
-var Policy = require('./policyModel').Policy;
+var Bookshelf = require('bookshelf')(knex);
+Bookshelf.plugin('registry');
+require('./tokenModel');
+require('./codeModel');
+require('./roleModel');
+require('./userRoleModel');
+require('./policyModel');
 
-var User = bookshelf.Model.extend({
+var User = Bookshelf.Model.extend({
   tableName: 'users',
   hasTimestamps: ['createdAt', 'updatedAt'],
   tokens: function() {
-    return this.hasMany(Token, 'userId');
+    return this.hasMany('Token', 'userId');
   },
   codes: function() {
-    return this.hasMany(Code, 'userId');
+    return this.hasMany('Code', 'userId');
   },
   usersRoles: function() {
-    return this.hasMany(UserRole, 'userId');
+    return this.hasMany('UserRole', 'userId');
   },
   policies: function() {
-    return this.hasMany(Policy, 'userId');
+    return this.hasMany('Policy', 'userId');
   },
   initialize: function () {
     this.on('creating', function (model) {
@@ -40,9 +41,4 @@ var User = bookshelf.Model.extend({
   }
 });
 
-var Users = bookshelf.Collection.extend({
-  model: User
-});
-
-module.exports.User = User;
-module.exports.Users = Users;
+module.exports = Bookshelf.model('User', User);

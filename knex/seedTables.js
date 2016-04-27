@@ -1,13 +1,13 @@
 var Promise = require('bluebird');
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
-var User = require('../models/userModel').User;
-var Resource = require('../models/resourceModel').Resource;
-var Permission = require('../models/permissionModel').Permission;
-var Client = require('../models/clientModel').Client;
-var Role = require('../models/roleModel').Role;
-var UserRole = require('../models/userRoleModel').UserRole;
-var Policy = require('../models/policyModel').Policy;
+var User = require('../models/userModel');
+var Resource = require('../models/resourceModel');
+var Permission = require('../models/permissionModel');
+var Client = require('../models/clientModel');
+var Role = require('../models/roleModel');
+var UserRole = require('../models/userRoleModel');
+var Policy = require('../models/policyModel');
 
 var promise = new Promise(function(resolve, reject) {
   return resolve(true);

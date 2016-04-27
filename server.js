@@ -5,18 +5,10 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-//var Promise = require('bluebird');
-//var mongoose = require('mongoose');
+var compression = require('compression');
 var passport = require('passport');
 var config = require('./configs/config');
 var app = express();
-
-// Set bluebird Promise
-//mongoose = Promise.promisifyAll(mongoose);
-//mongoose.Promise = Promise;
-
-// Connect to MongoDB
-//mongoose.connect(config.mongoose.uri);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,6 +17,7 @@ app.set('view engine', 'jade');
 //Set morgan logger for debug mode
 //app.use(logger('dev'));
 
+app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

@@ -5,9 +5,9 @@ var BearerStrategy = require('passport-http-bearer').Strategy;
 var ClientPasswordStrategy  = require('passport-oauth2-client-password').Strategy;
 var Promise = require('bluebird');
 var headerHelper = require('../utils/headerParser');
-var User = require('../models/userModel').User;
-var Client = require('../models/clientModel').Client;
-var Token = require('../models/tokenModel').Token;
+var User = require('../models/userModel');
+var Client = require('../models/clientModel');
+var Token = require('../models/tokenModel');
 var config = require('../configs/config');
 var NotFoundError = require('../exceptions/notFoundError');
 var ExpiredTokenError = require('../exceptions/expiredTokenError');
@@ -102,7 +102,7 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
       if (!token) {
         throw new NotFoundError();
       }
-      // Check token expiration if it isn't jwt
+      // Check token expiration if it isn't a jwt
       if (config.jwt.enabled === false && Math.round((Date.now() - this.token.get('createdAt')) / 1000) > config.tokenLife) {
         return false;
       }
@@ -178,13 +178,13 @@ var verifyJwtToken = function (req, token) {
         var ipAddress = headerHelper.getIP(req);
         var userAgent = headerHelper.getUA(req);
 
-        if ((decoded.bua == null || decoded.bua == userAgent) && (config.jwt.ipcheck === false || decoded.ipa == ipAddress)) {
+        if ((decoded.bua === null || decoded.bua === userAgent) && (config.jwt.ipcheck === false || decoded.ipa === ipAddress)) {
           resolve(true);
         }
 
         reject(new NotFoundError());
       }
-      else if (err.name && err.name == 'TokenExpiredError') {
+      else if (err.name && err.name === 'TokenExpiredError') {
         resolve(false);
       }
       else {

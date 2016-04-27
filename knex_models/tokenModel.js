@@ -1,30 +1,29 @@
 var config = require('../configs/config');
 var knex = require('knex')(config.knex);
-var bookshelf = require('bookshelf')(knex);
-var User = require('./userModel').User;
-var Client = require('./clientModel').Client;
+var Bookshelf = require('bookshelf')(knex);
+Bookshelf.plugin('registry');
+require('./userModel');
+require('./clientModel');
 
-var Token = bookshelf.Model.extend({
+var Token = Bookshelf.Model.extend({
   tableName: 'tokens',
   hasTimestamps: ['createdAt'],
   user: function() {
-    return this.belongsTo(User, 'id');
+    return this.belongsTo('User', 'id');
   },
   client: function() {
-    return this.belongsTo(Client, 'id');
+    return this.belongsTo('Client', 'id');
   },
   removeBy: function (clause, trx) {
-    return knex(this.tableName)
+    return Bookshelf.knex(this.tableName)
       .where(clause)
       .transacting(trx || {})
       .returning('id')
-      .del();
+      .del()
+      .then(function(res) {
+        return res.length;
+      });
   }
 });
 
-var Tokens = bookshelf.Collection.extend({
-  model: Token
-});
-
-module.exports.Token = Token;
-module.exports.Tokens = Tokens;
+module.exports = Bookshelf.model('Token', Token);

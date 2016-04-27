@@ -93,7 +93,7 @@ knex.raw('')
     table.increments('id').primary();
     table.string('token', 1024).notNullable().unique();
     table.string('refresh', 1024).notNullable().unique();
-    table.string('userAgent', 100).nullable();
+    table.string('userAgent', 512).nullable();
     table.string('ipAddress', 15).nullable();
     table.bigInteger('userId').unsigned().index().references('id').inTable('users').onDelete('CASCADE').onUpdate('CASCADE');
     table.bigInteger('clientId').unsigned().index().references('id').inTable('clients').onDelete('CASCADE').onUpdate('CASCADE');
