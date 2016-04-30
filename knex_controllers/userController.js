@@ -36,7 +36,7 @@ var addUser = function(req, res) {
 //Get an user by id
 var getUser = function(req, res) {
   var userId = req.params.user;
-
+  
   if (userId) {
     User.forge()
     .where({

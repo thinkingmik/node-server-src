@@ -25,7 +25,9 @@ var fillClientCredentials = function(req, res, callback) {
       name: clientId,
       enabled: true
     })
-    .fetch()
+    .fetch({
+      columns: ['id', 'secret']
+    })
     .then(function(client) {
       if (!client) {
         throw new NotFoundError();

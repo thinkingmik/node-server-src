@@ -29,7 +29,9 @@ server.deserializeClient(function(id, callback) {
     id: id,
     enabled: true
   })
-  .fetch()
+  .fetch({
+    columns: ['id']
+  })
   .then(function(client) {
     return client;
   })
@@ -57,7 +59,9 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, re
   .where({
     code: code
   })
-  .fetch()
+  .fetch({
+    columns: ['id', 'clientId', 'userId', 'redirectUri']
+  })
   .bind({})
   .then(function(authCode) {
     this.authCode = authCode;
@@ -95,7 +99,9 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
     username: username,
     enabled: true
   })
-  .fetch()
+  .fetch({
+    columns: ['id', 'username', 'password']
+  })
   .bind({})
   .then(function(user) {
     this.user = user;
@@ -131,7 +137,9 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
   .where({
     refresh: refreshToken
   })
-  .fetch()
+  .fetch({
+    columns: ['id', 'userId', 'clientId', 'ipAddress', 'userAgent']
+  })
   .bind({})
   .then(function(token) {
     this.token = token;
@@ -148,7 +156,9 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
         id: this.token.get('userId'),
         enabled: true
       })
-      .fetch();
+      .fetch({
+        columns: ['id']
+      });
   })
   .then(function(user) {
     this.user = user;
@@ -196,7 +206,9 @@ var doLogout = function(req, res) {
   .where({
     token: token
   })
-  .fetch()
+  .fetch({
+    columns: ['id', 'userId', 'clientId']
+  })
   .then(function(token) {
     if (!token) {
       throw new NotFoundError();
@@ -308,7 +320,9 @@ exports.authorization = [
       name: clientId,
       enabled: true
     })
-    .fetch()
+    .fetch({
+      columns: ['id', 'name', 'description']
+    })
     .then(function(client) {
       return [client, redirectUri];
     })

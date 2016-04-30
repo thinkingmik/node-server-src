@@ -47,7 +47,9 @@ var getUserId = function(req) {
       .where({
         token: bearerToken
       })
-      .fetch()
+      .fetch({
+        columns: ['userId']
+      })
       .then(function(token) {
         if (!token) {
           throw new NotFoundError();
@@ -64,7 +66,9 @@ var getUserId = function(req) {
         username: credentials['username'],
         enabled: true
       })
-      .fetch()
+      .fetch({
+        columns: ['id', 'password']
+      })
       .bind({})
       .then(function(user) {
         this.user = user;

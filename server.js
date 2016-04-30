@@ -1,25 +1,27 @@
+if (process.env.NODE_ENV == '' || !process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'development';
+}
 var express = require('express');
 var session = require('express-session');
 var loader = require('auto-loader');
 var path = require('path');
-var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var compression = require('compression');
 var passport = require('passport');
 var config = require('./configs/config')[process.env.NODE_ENV];
+var logger = require('./logger');
 var app = express();
 
-if (process.env.NODE_ENV == "" || !process.env.NODE_ENV) {
-  process.env.NODE_ENV = 'development';
-}
+logger.debug("Testing winsont");
+logger.error("Testing winsont");
+logger.info("Testing winsont");
+logger.warn("Testing winsont");
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
-//Set morgan logger for debug mode
-//app.use(logger('dev'));
 
 app.use(compression());
 app.use(bodyParser.json());

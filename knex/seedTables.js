@@ -62,7 +62,7 @@ var promise = new Promise(function(resolve, reject) {
     username: 'm.cameron',
     password: 'cameron123',
     email: 'm.cameron@node.com',
-    firstName: 'Mat',
+    firstName: 'Matt',
     lastName: 'Cameron'
   })
   .save();

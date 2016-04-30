@@ -20,7 +20,9 @@ passport.use('basic', new BasicStrategy(
       username: username,
       enabled: true
     })
-    .fetch()
+    .fetch({
+      columns: ['id', 'username', 'email', 'firstName', 'lastName', 'password']
+    })
     .bind({})
     .then(function(user) {
       this.user = user;
@@ -57,7 +59,9 @@ passport.use('client-basic', new BasicStrategy(
       name: clientId,
       enabled: true
     })
-    .fetch()
+    .fetch({
+      columns: ['id', 'name', 'secret', 'description', 'domain']
+    })
     .bind({})
     .then(function(client) {
       if (!client || client.get('secret') !== clientSecret) {
@@ -76,7 +80,9 @@ passport.use('client-password', new ClientPasswordStrategy(
       name: clientId,
       enabled: true
     })
-    .fetch()
+    .fetch({
+      columns: ['id', 'name', 'secret', 'description', 'domain']
+    })
     .bind({})
     .then(function(client) {
       if (!client || client.get('secret') !== clientSecret) {
@@ -95,7 +101,9 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
     .where({
       token: accessToken
     })
-    .fetch()
+    .fetch({
+      columns: ['id', 'token', 'refresh', 'userId', 'clientId', 'createdAt']
+    })
     .bind({})
     .then(function(token) {
       this.token = token;
@@ -128,7 +136,9 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
             id: this.token.get('userId'),
             enabled: true
           })
-          .fetch();
+          .fetch({
+            columns: ['id', 'username', 'password']
+          });
       }
       else {
         return Client.forge()
@@ -136,7 +146,9 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
             id: this.token.get('clientId'),
             enabled: true
           })
-          .fetch();
+          .fetch({
+            columns: ['id']
+          });
       }
     })
     .then(function(ret) {

@@ -1,6 +1,7 @@
 module.exports = {
   development: {
     port: 3000,
+    logLevel: 'error',
     sessionSecret: 'm4bJ%T310Hof$9z',
     tokenLife: 3600, //seconds
     jwt: {
