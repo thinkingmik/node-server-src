@@ -1,5 +1,5 @@
 var server = require('../server');
-var config = require('../configs/config');
+var config = require('../configs/config')[process.env.NODE_ENV];
 var cheerio = require('cheerio')
 var chai = require('chai');
 var should = chai.should();
@@ -40,12 +40,6 @@ describe('Get a protected resource with bearer token authentication', function()
     api.get(usersEndpoint)
       .set('Authorization', 'bearer ' + accessToken)
       .expect(200)
-      .end(done);
-  });
-  it('should return an invalid acl message', function(done) {
-    api.get(usersEndpoint)
-      .set('Authorization', 'bearer ' + accessToken)
-      .expect(403)
       .end(done);
   });
 });

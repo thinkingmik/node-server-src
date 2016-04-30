@@ -8,7 +8,7 @@ var headerHelper = require('../utils/headerParser');
 var User = require('../models/userModel');
 var Client = require('../models/clientModel');
 var Token = require('../models/tokenModel');
-var config = require('../configs/config');
+var config = require('../configs/config')[process.env.NODE_ENV];
 var NotFoundError = require('../exceptions/notFoundError');
 var ExpiredTokenError = require('../exceptions/expiredTokenError');
 
@@ -114,17 +114,14 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
     })
     .then(function(isValidToken) {
       if (isValidToken === false) {
-        return this.token.destroy();
+        return this.token.destroy()
+          .then(function() {
+            throw new ExpiredTokenError();
+          });
       }
-      return 0;
+      return isValidToken;
     })
     .then(function(ret) {
-      if (ret > 0) {
-        throw new ExpiredTokenError();
-      }
-      return;
-    })
-    .then(function() {
       if (this.token.get('userId') != null) {
         return User.forge()
           .where({
@@ -155,9 +152,6 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
       else if (err instanceof NotFoundError) {
         callback(null, false);
       }
-      else if (err instanceof ExpiredTokenError) {
-        callback(null, false);
-      }
       else {
         callback(err);
       }
@@ -169,26 +163,25 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
 var verifyJwtToken = function (req, token) {
   return new Promise(function(resolve, reject) {
     var secret = config.jwt.secretKey;
-    if (config.jwt.cert != null) {
+    if (config.jwt.cert !== null) {
       secret = fs.readFileSync(config.jwt.cert);
     }
 
-    jwt.verify(token.get('token'), secret, { ignoreExpiration: false }, function(err, decoded) {
+    return jwt.verify(token.get('token'), secret, { ignoreExpiration: false }, function(err, decoded) {
       if (!err) {
         var ipAddress = headerHelper.getIP(req);
         var userAgent = headerHelper.getUA(req);
 
-        if ((decoded.bua === null || decoded.bua === userAgent) && (config.jwt.ipcheck === false || decoded.ipa === ipAddress)) {
-          resolve(true);
+        if ((config.jwt.uacheck === false || decoded.bua === null || decoded.bua === userAgent) && (config.jwt.ipcheck === false || decoded.ipa === ipAddress)) {
+          return resolve(true);
         }
-
-        reject(new NotFoundError());
+        return reject(new NotFoundError());
       }
       else if (err.name && err.name === 'TokenExpiredError') {
-        resolve(false);
+        return resolve(false);
       }
       else {
-        reject(err);
+        return reject(err);
       }
     });
   });

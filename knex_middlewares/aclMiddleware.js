@@ -52,10 +52,10 @@ var getUserId = function(req) {
         if (!token) {
           throw new NotFoundError();
         }
-        resolve(token.get('userId'));
+        return resolve(token.get('userId'));
       })
       .catch(function(err) {
-        reject(err);
+        return reject(err);
       });
     }
     else {
@@ -77,10 +77,10 @@ var getUserId = function(req) {
         if (!isMatch) {
           throw new NotFoundError();
         }
-        resolve(this.user.get('id'));
+        return resolve(this.user.get('id'));
       })
       .catch(function(err) {
-        reject(err);
+        return reject(err);
       });
     }
   });

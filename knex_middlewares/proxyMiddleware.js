@@ -1,5 +1,5 @@
 var headerHelper = require('../utils/headerParser');
-var config = require('../configs/config');
+var config = require('../configs/config')[process.env.NODE_ENV];
 var Client = require('../models/clientModel');
 var NotFoundError = require('../exceptions/notFoundError');
 
@@ -11,8 +11,8 @@ var fillClientCredentials = function(req, res, callback) {
   var isBasicAuth = false;
 
   if (config.jwt.enabled === true) {
-    req.body['userAgent'] = headerHelper.getUA(req);
-    req.body['ipAddress'] = headerHelper.getIP(req);
+    req.body['userAgent_' + config.jwt.secretKey] = headerHelper.getUA(req);
+    req.body['ipAddress_' + config.jwt.secretKey] = headerHelper.getIP(req);
   }
 
   if (auth != null && auth.indexOf('Basic') >= 0) {

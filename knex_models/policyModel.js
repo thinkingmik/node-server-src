@@ -1,9 +1,6 @@
 var Promise = require('bluebird');
-var moment = require('moment');
-var config = require('../configs/config');
-var knex = require('knex')(config.knex);
-var Bookshelf = require('bookshelf')(knex);
-Bookshelf.plugin('registry');
+var Moment = require('moment');
+var Bookshelf = require('../database');
 require('./userModel');
 require('./roleModel');
 require('./userRoleModel');
@@ -26,11 +23,11 @@ var Policy = Bookshelf.Model.extend({
     return this.belongsTo('Permission', 'id');
   },
   fetchAllByUserId: function(userId) {
-    var rolesTable = 'roles';
-    var usersRolesTable = 'usersRoles';
+    var rolesTable = Bookshelf.model('Role').forge().tableName;
+    var usersRolesTable = Bookshelf.model('UserRole').forge().tableName;
     var policiesTable = this.tableName;
     return new Promise(function(resolve, reject) {
-      var nowdate = moment().format();
+      var nowdate = Moment().format();
       Bookshelf.knex.select(policiesTable + '.*')
       .from(policiesTable)
       .leftJoin(usersRolesTable, usersRolesTable + '.roleId', policiesTable + '.roleId')

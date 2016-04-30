@@ -7,8 +7,12 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var compression = require('compression');
 var passport = require('passport');
-var config = require('./configs/config');
+var config = require('./configs/config')[process.env.NODE_ENV];
 var app = express();
+
+if (process.env.NODE_ENV == "" || !process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'development';
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -49,7 +53,7 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+if (process.env.NODE_ENV === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.json({

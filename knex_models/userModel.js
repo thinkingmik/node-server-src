@@ -1,9 +1,6 @@
 var Promise = require('bluebird');
+var Bookshelf = require('../database');
 var bcrypt = Promise.promisifyAll(require('bcrypt-nodejs'));
-var config = require('../configs/config');
-var knex = require('knex')(config.knex);
-var Bookshelf = require('bookshelf')(knex);
-Bookshelf.plugin('registry');
 require('./tokenModel');
 require('./codeModel');
 require('./roleModel');

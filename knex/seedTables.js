@@ -1,5 +1,5 @@
 var Promise = require('bluebird');
-var config = require('../configs/config');
+var config = require('../configs/config')[process.env.NODE_ENV];
 var knex = require('knex')(config.knex);
 var User = require('../models/userModel');
 var Resource = require('../models/resourceModel');
@@ -24,13 +24,57 @@ var promise = new Promise(function(resolve, reject) {
   .save();
 })
 .then(function() {
-  console.log('[SEED] Inserting new user guest');
+  console.log('[SEED] Inserting new user e.vedder');
   return User.forge({
-    username: 'guest',
-    password: 'guest123',
-    email: 'guest@node.com',
-    firstName: 'user',
-    lastName: 'guest'
+    username: 'e.vedder',
+    password: 'vedder123',
+    email: 'e.vedder@node.com',
+    firstName: 'Eddie',
+    lastName: 'Vedder'
+  })
+  .save();
+})
+.then(function() {
+  console.log('[SEED] Inserting new user m.mccready');
+  return User.forge({
+    username: 'm.mccready',
+    password: 'mccready123',
+    email: 'm.mccready@node.com',
+    firstName: 'Mike',
+    lastName: 'McCready'
+  })
+  .save();
+})
+.then(function() {
+  console.log('[SEED] Inserting new user j.ament');
+  return User.forge({
+    username: 'j.ament',
+    password: 'ament123',
+    email: 'j.ament@node.com',
+    firstName: 'Jeff',
+    lastName: 'Ament'
+  })
+  .save();
+})
+.then(function() {
+  console.log('[SEED] Inserting new user m.cameron');
+  return User.forge({
+    username: 'm.cameron',
+    password: 'cameron123',
+    email: 'm.cameron@node.com',
+    firstName: 'Mat',
+    lastName: 'Cameron'
+  })
+  .save();
+})
+.then(function() {
+  console.log('[SEED] Inserting new user s.gossard');
+  return User.forge({
+    username: 's.gossard',
+    password: 'gossard123',
+    email: 's.gossard@node.com',
+    firstName: 'Stone',
+    lastName: 'Gossard'
   })
   .save();
 })
@@ -77,57 +121,89 @@ var promise = new Promise(function(resolve, reject) {
   .save();
 })
 .then(function() {
-  console.log('[SEED] Inserting new permission GET');
+  console.log('[SEED] Inserting new user\'s role');
+  return UserRole.forge({
+    userId: 3,
+    roleId: 2
+  })
+  .save();
+})
+.then(function() {
+  console.log('[SEED] Inserting new user\'s role');
+  return UserRole.forge({
+    userId: 4,
+    roleId: 2
+  })
+  .save();
+})
+.then(function() {
+  console.log('[SEED] Inserting new user\'s role');
+  return UserRole.forge({
+    userId: 5,
+    roleId: 2
+  })
+  .save();
+})
+.then(function() {
+  console.log('[SEED] Inserting new user\'s role');
+  return UserRole.forge({
+    userId: 6,
+    roleId: 2
+  })
+  .save();
+})
+.then(function() {
+  console.log('[SEED] Inserting new permission get');
   return Permission.forge({
-    id: 'GET',
-    description: 'read'
+    id: 'get',
+    description: 'the read permission'
   })
   .save(null, {method: 'insert'});
 })
 .then(function() {
-  console.log('[SEED] Inserting new permission POST');
+  console.log('[SEED] Inserting new permission post');
   return Permission.forge({
-    id: 'POST',
-    description: 'create'
+    id: 'post',
+    description: 'the creation permission'
   })
   .save(null, {method: 'insert'});
 })
 .then(function() {
-  console.log('[SEED] Inserting new permission PUT');
+  console.log('[SEED] Inserting new permission put');
   return Permission.forge({
-    id: 'PUT',
-    description: 'update'
+    id: 'put',
+    description: 'the update permission'
   })
   .save(null, {method: 'insert'});
 })
 .then(function() {
-  console.log('[SEED] Inserting new permission DELETE');
+  console.log('[SEED] Inserting new permission delete');
   return Permission.forge({
-    id: 'DELETE',
-    description: 'delete'
+    id: 'delete',
+    description: 'the deletion permission'
   })
   .save(null, {method: 'insert'});
 })
 .then(function() {
-  console.log('[SEED] Inserting new resource USERS');
+  console.log('[SEED] Inserting new resource users');
   return Resource.forge({
-    id: 'USERS',
+    id: 'users',
     description: 'the users resource'
   })
   .save(null, {method: 'insert'});
 })
 .then(function() {
-  console.log('[SEED] Inserting new resource CLIENTS');
+  console.log('[SEED] Inserting new resource clients');
   return Resource.forge({
-    id: 'CLIENTS',
+    id: 'clients',
     description: 'the clients resource'
   })
   .save(null, {method: 'insert'});
 })
 .then(function() {
-  console.log('[SEED] Inserting new resource ROLES');
+  console.log('[SEED] Inserting new resource roles');
   return Resource.forge({
-    id: 'ROLES',
+    id: 'roles',
     description: 'the roles resource'
   })
   .save(null, {method: 'insert'});
@@ -137,8 +213,8 @@ var promise = new Promise(function(resolve, reject) {
   return Policy.forge({
     userId: 1,
     roleId: null,
-    resourceId: 'USERS',
-    permissionId: 'GET'
+    resourceId: 'users',
+    permissionId: 'get'
   })
   .save();
 })
@@ -147,8 +223,8 @@ var promise = new Promise(function(resolve, reject) {
   return Policy.forge({
     userId: null,
     roleId: 1,
-    resourceId: 'USERS',
-    permissionId: 'POST'
+    resourceId: 'users',
+    permissionId: 'post'
   })
   .save();
 })
@@ -157,8 +233,8 @@ var promise = new Promise(function(resolve, reject) {
   return Policy.forge({
     userId: 2,
     roleId: null,
-    resourceId: 'CLIENTS',
-    permissionId: 'GET'
+    resourceId: 'clients',
+    permissionId: 'get'
   })
   .save();
 })
@@ -167,8 +243,8 @@ var promise = new Promise(function(resolve, reject) {
   return Policy.forge({
     userId: null,
     roleId: 2,
-    resourceId: 'CLIENTS',
-    permissionId: 'POST'
+    resourceId: 'clients',
+    permissionId: 'post'
   })
   .save();
 })

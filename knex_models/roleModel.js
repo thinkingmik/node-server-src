@@ -1,7 +1,4 @@
-var config = require('../configs/config');
-var knex = require('knex')(config.knex);
-var Bookshelf = require('bookshelf')(knex);
-Bookshelf.plugin('registry');
+var Bookshelf = require('../database');
 require('./userRoleModel');
 require('./policyModel');
 

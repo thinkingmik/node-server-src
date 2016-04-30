@@ -1,5 +1,5 @@
 var server = require('../server');
-var config = require('../configs/config');
+var config = require('../configs/config')[process.env.NODE_ENV];
 var cheerio = require('cheerio')
 var chai = require('chai');
 var should = chai.should();

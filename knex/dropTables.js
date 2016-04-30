@@ -1,5 +1,5 @@
 var Promise = require('bluebird');
-var config = require('../configs/config');
+var config = require('../configs/config')[process.env.NODE_ENV];
 var knex = require('knex')(config.knex);
 
 knex.raw('')

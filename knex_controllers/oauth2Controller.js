@@ -2,13 +2,14 @@ var oauth2orize = require('oauth2orize');
 var fs = require('fs');
 var jwt = require('jsonwebtoken');
 var crypto = require('crypto');
+var Moment = require('moment');
 var Promise = require('bluebird');
 var User = require('../models/userModel');
 var Client = require('../models/clientModel');
 var Token = require('../models/tokenModel');
 var Code = require('../models/codeModel');
 var headerHelper = require('../utils/headerParser');
-var config = require('../configs/config');
+var config = require('../configs/config')[process.env.NODE_ENV];
 var NotFoundError = require('../exceptions/notFoundError');
 var handleError = require('../utils/handleJsonResponse').Error;
 var handleSuccess = require('../utils/handleJsonResponse').Success;
@@ -125,7 +126,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
 }));
 
 // Exchange refresh token with new access token (refresh token grant)
-server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, scope, req, callback) {
+server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken, callback) {
   Token.forge()
   .where({
     refresh: refreshToken
@@ -137,6 +138,11 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
     if (!token) {
       throw new NotFoundError();
     }
+
+    this.req = {};
+    this.req['ipAddress_' + config.jwt.secretKey] = this.token.get('ipAddress');
+    this.req['userAgent_' + config.jwt.secretKey] = this.token.get('userAgent');
+
     return User.forge()
       .where({
         id: this.token.get('userId'),
@@ -152,7 +158,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
     return this.token.destroy();
   })
   .then(function() {
-    return createTokens(client, this.user.get('id'), req);
+    return createTokens(client, this.user.get('id'), this.req);
   })
   .nodeify(function(err, token, refresh, expires) {
     if (!err) {
@@ -214,9 +220,8 @@ var test = function(req, res) {
 
 // Create access token (jwt if enabled) and refresh token by client and user id
 var createTokens = function(client, userId, req) {
-  //TODO: wait for pull request on oauth2orize module
-  var ipAddress = req.ipAddress;//headerHelper.getIP(req);
-  var userAgent = req.userAgent;//headerHelper.getUA(req);
+  var ipAddress = (req !== null && req['ipAddress_' + config.jwt.secretKey]) ? req['ipAddress_' + config.jwt.secretKey] : null;
+  var userAgent = (req !== null && req['userAgent_' + config.jwt.secretKey]) ? req['userAgent_' + config.jwt.secretKey] : null;
 
   return new Promise(function(resolve, reject) {
     createJwtToken(client, userId, ipAddress, userAgent)
@@ -238,10 +243,10 @@ var createTokens = function(client, userId, req) {
         token.get('refresh'),
         { 'expires_in': config.tokenLife }
       ];
-      resolve(obj);
+      return resolve(obj);
     })
     .catch(function(err) {
-      reject(err);
+      return reject(err);
     });
   });
 }
@@ -249,39 +254,44 @@ var createTokens = function(client, userId, req) {
 // Create a JWT token
 var createJwtToken = function(client, userId, ipAddress, userAgent) {
   return new Promise(function(resolve, reject) {
-    if (config.jwt.enabled === false) {
-      resolve(uid(32));
-    }
-    var createdAt = parseInt(Date.now(), 10);
-    var token = null;
+    try {
+      if (config.jwt.enabled === false) {
+        return resolve(uid(32));
+      }
 
-    var claim = {
-      'iss': client.name,
-      'sub': (userId != null) ? userId : client.get('id'),
-      'aud': client.get('domain'),
-      'ipa': ipAddress,
-      'bua': userAgent,
-      'jti': uid(16),
-      'iat': createdAt
-    };
+      var createdAt = Moment().format();
+      var token = null;
 
-    if (config.jwt.cert != null) {
-      var cert = fs.readFileSync(config.jwt.cert);
-      token = jwt.sign(
-        claim,
-        cert,
-        { algorithm: config.jwt.algorithm, expiresIn: config.tokenLife }
-      );
-    }
-    else {
-      token = jwt.sign(
-        claim,
-        config.jwt.secretKey,
-        { expiresIn: config.tokenLife }
-      );
-    }
+      var claim = {
+        'iss': client.name,
+        'sub': (userId !== null) ? userId : client.get('id'),
+        'aud': client.get('domain'),
+        'ipa': ipAddress,
+        'bua': userAgent,
+        'jti': uid(16),
+        'iat': createdAt
+      };
 
-    resolve(token);
+      if (config.jwt.cert !== null) {
+        var cert = fs.readFileSync(config.jwt.cert);
+        token = jwt.sign(
+          claim,
+          cert,
+          { algorithm: config.jwt.algorithm, expiresIn: config.tokenLife }
+        );
+      }
+      else {
+        token = jwt.sign(
+          claim,
+          config.jwt.secretKey,
+          { expiresIn: config.tokenLife }
+        );
+      }
+      return resolve(token);
+    }
+    catch (err) {
+      return reject(err);
+    }
   });
 }
 

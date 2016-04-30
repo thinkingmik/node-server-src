@@ -8,7 +8,7 @@ var headerHelper = require('../utils/headerParser');
 var User = require('../models/user');
 var Client = require('../models/client');
 var Token = require('../models/token');
-var config = require('../configs/config');
+var config = require('../configs/config')[process.env.NODE_ENV];
 var NotFoundError = require('../exceptions/notFoundError');
 var ExpiredTokenError = require('../exceptions/expiredTokenError');
 
