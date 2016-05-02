@@ -1,3 +1,6 @@
+if (process.env.NODE_ENV == '' || !process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'development';
+}
 var config = require('../configs/config')[process.env.NODE_ENV];
 var knex = require('knex')(config.knex);
 

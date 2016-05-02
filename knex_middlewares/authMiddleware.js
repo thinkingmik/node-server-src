@@ -64,10 +64,17 @@ passport.use('client-basic', new BasicStrategy(
     })
     .bind({})
     .then(function(client) {
-      if (!client || client.get('secret') !== clientSecret) {
+      this.client = client;
+      if (!client) {
         return false;
       }
-      return client;
+      return client.verifySecret(clientSecret);
+    })
+    .then(function(isMatch) {
+      if (!isMatch) {
+        return false;
+      }
+      return this.client;
     })
     .nodeify(callback);
   }
@@ -85,10 +92,17 @@ passport.use('client-password', new ClientPasswordStrategy(
     })
     .bind({})
     .then(function(client) {
-      if (!client || client.get('secret') !== clientSecret) {
+      this.client = client;
+      if (!client) {
         return false;
       }
-      return client;
+      return client.verifySecret(clientSecret);
+    })
+    .then(function(isMatch) {
+      if (!isMatch) {
+        return false;
+      }
+      return this.client;
     })
     .nodeify(callback);
   }

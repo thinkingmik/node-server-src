@@ -13,12 +13,6 @@ var config = require('./configs/config')[process.env.NODE_ENV];
 var logger = require('./logger');
 var app = express();
 
-logger.debug("Testing winsont");
-logger.error("Testing winsont");
-logger.info("Testing winsont");
-logger.warn("Testing winsont");
-
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -31,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(session({
   // Use express session support since OAuth2orize requires it
-  secret: config.sessionSecret,
+  secret: config.sessionSecretKey,
   saveUninitialized: true,
   resave: true
 }));

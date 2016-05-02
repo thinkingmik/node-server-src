@@ -3,16 +3,10 @@ var winston = require('winston');
 
 winston.level = config.logLevel;
 winston.setLevels({
-    debug: 0,
-    info: 1,
-    warn: 2,
-    error: 3,
+  error: 0, warn: 1, info: 2, debug: 3
 });
 winston.addColors({
-    debug: 'magenta',
-    info: 'cyan',
-    warn: 'yellow',
-    error: 'red'
+  error: 'red', warn: 'yellow', info: 'cyan', debug: 'magenta'
 });
 winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, {

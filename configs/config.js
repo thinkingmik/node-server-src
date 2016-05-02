@@ -1,14 +1,20 @@
 module.exports = {
   development: {
     port: 3000,
-    logLevel: 'error',
-    sessionSecret: 'm4bJ%T310Hof$9z',
+    logLevel: 'debug',
+    sessionSecretKey: 'm4bJ%T310Hof$9z',
+    crypto: {
+      secretKey: 'K7pHX4OASe?c&lm',
+      algorithm: 'AES-256-CBC',
+      inputEncoding: 'utf8',
+      outputEncoding: 'base64'
+    },
     tokenLife: 3600, //seconds
     jwt: {
       enabled: true,
       ipcheck: false,
       uacheck: false,
-      secretKey: 'K7pHX4OASe?c_lm',
+      secretKey: 'K7pHX4OASe?c&lm',
       cert: null,
       algorithm: 'RS256'
     },
