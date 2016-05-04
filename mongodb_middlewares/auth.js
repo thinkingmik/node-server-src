@@ -100,12 +100,12 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
       }
 
       // Check token expiration if it isn't jwt
-      if (config.jwt.enabled === false && Math.round((Date.now() - this.token.created) / 1000) > config.tokenLife) {
+      if (config.token.jwt.enabled === false && Math.round((Date.now() - this.token.created) / 1000) > config.token.life) {
         return false;
       }
 
       // Check jwt token
-      if (config.jwt.enabled === true) {
+      if (config.token.jwt.enabled === true) {
         return verifyJwtTokenAsync(req, token);
       }
 
@@ -172,9 +172,9 @@ passport.use('bearer', new BearerStrategy({ passReqToCallback: true },
 //Verify if JWT is valid
 var verifyJwtTokenAsync = function (req, token) {
   return new Promise(function(resolve, reject) {
-    var secret = config.jwt.secretKey;
-    if (config.jwt.cert != null) {
-      secret = fs.readFileSync(config.jwt.cert);
+    var secret = config.token.jwt.secretKey;
+    if (config.token.jwt.cert != null) {
+      secret = fs.readFileSync(config.token.jwt.cert);
     }
 
     jwt.verify(token.value, secret, { ignoreExpiration: false }, function(err, decoded) {
@@ -182,7 +182,7 @@ var verifyJwtTokenAsync = function (req, token) {
         var ipAddress = headerHelper.getIP(req);
         var userAgent = headerHelper.getUA(req);
 
-        if ((decoded.bua == null || decoded.bua == userAgent) && (config.jwt.ipcheck === false || decoded.ipa == ipAddress)) {
+        if ((decoded.bua == null || decoded.bua == userAgent) && (config.token.jwt.ipcheck === false || decoded.ipa == ipAddress)) {
           resolve(true);
         }
 

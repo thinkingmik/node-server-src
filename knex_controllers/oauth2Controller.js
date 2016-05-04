@@ -41,7 +41,7 @@ server.deserializeClient(function(id, callback) {
 // Exchange credentials for authorization code (authorization code grant)
 server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, req, callback) {
   Code.forge({
-    code: uid(8),
+    code: uid(16),
     redirectUri: redirectUri,
     clientId: client.get('id'),
     userId: user.get('id')
@@ -148,8 +148,8 @@ server.exchange(oauth2orize.exchange.refreshToken(function (client, refreshToken
     }
 
     this.req = {};
-    this.req['ipAddress_' + config.jwt.secretKey] = this.token.get('ipAddress');
-    this.req['userAgent_' + config.jwt.secretKey] = this.token.get('userAgent');
+    this.req['ipAddress_auto_generated'] = this.token.get('ipAddress');
+    this.req['userAgent_auto_generated'] = this.token.get('userAgent');
 
     return User.forge()
       .where({
@@ -232,8 +232,8 @@ var test = function(req, res) {
 
 // Create access token (jwt if enabled) and refresh token by client and user id
 var createTokens = function(client, userId, req) {
-  var ipAddress = (req !== null && req['ipAddress_' + config.jwt.secretKey]) ? req['ipAddress_' + config.jwt.secretKey] : null;
-  var userAgent = (req !== null && req['userAgent_' + config.jwt.secretKey]) ? req['userAgent_' + config.jwt.secretKey] : null;
+  var ipAddress = (req !== null && req['ipAddress_auto_generated']) ? req['ipAddress_auto_generated'] : null;
+  var userAgent = (req !== null && req['userAgent_auto_generated']) ? req['userAgent_auto_generated'] : null;
 
   return new Promise(function(resolve, reject) {
     createJwtToken(client, userId, ipAddress, userAgent)
@@ -241,7 +241,7 @@ var createTokens = function(client, userId, req) {
     .then(function(guid) {
       return Token.forge({
         token: guid,
-        refresh: uid(32),
+        refresh: uid(config.token.length),
         clientId: client.get('id'),
         userId: userId,
         ipAddress: ipAddress,
@@ -253,7 +253,7 @@ var createTokens = function(client, userId, req) {
       var obj = [
         token.get('token'),
         token.get('refresh'),
-        { 'expires_in': config.tokenLife }
+        { 'expires_in': config.token.life }
       ];
       return resolve(obj);
     })
@@ -267,8 +267,8 @@ var createTokens = function(client, userId, req) {
 var createJwtToken = function(client, userId, ipAddress, userAgent) {
   return new Promise(function(resolve, reject) {
     try {
-      if (config.jwt.enabled === false) {
-        return resolve(uid(32));
+      if (config.token.jwt.enabled === false) {
+        return resolve(uid(config.token.length));
       }
 
       var createdAt = Moment().format();
@@ -284,19 +284,19 @@ var createJwtToken = function(client, userId, ipAddress, userAgent) {
         'iat': createdAt
       };
 
-      if (config.jwt.cert !== null) {
-        var cert = fs.readFileSync(config.jwt.cert);
+      if (config.token.jwt.cert !== null) {
+        var cert = fs.readFileSync(config.token.jwt.cert);
         token = jwt.sign(
           claim,
           cert,
-          { algorithm: config.jwt.algorithm, expiresIn: config.tokenLife }
+          { algorithm: config.token.jwt.algorithm, expiresIn: config.token.life }
         );
       }
       else {
         token = jwt.sign(
           claim,
-          config.jwt.secretKey,
-          { expiresIn: config.tokenLife }
+          config.token.jwt.secretKey,
+          { expiresIn: config.token.life }
         );
       }
       return resolve(token);

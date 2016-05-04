@@ -246,7 +246,7 @@ var createTokensAsync = function(client, userId, req) {
       var ret = [
         token.value,
         token.refresh,
-        { 'expires_in': config.tokenLife }
+        { 'expires_in': config.token.life }
       ];
       resolve(ret);
     })
@@ -259,7 +259,7 @@ var createTokensAsync = function(client, userId, req) {
 // Create a JWT token
 var createJwtTokenAsync = function(client, userId, ipAddress, userAgent) {
   return new Promise(function(resolve, reject) {
-    if (config.jwt.enabled === false) {
+    if (config.token.jwt.enabled === false) {
       resolve(uid(32));
     }
     var createdAt = parseInt(Date.now(), 10);
@@ -277,19 +277,19 @@ var createJwtTokenAsync = function(client, userId, ipAddress, userAgent) {
       'policies': []
     };
 
-    if (config.jwt.cert != null) {
-      var cert = fs.readFileSync(config.jwt.cert);
+    if (config.token.jwt.cert != null) {
+      var cert = fs.readFileSync(config.token.jwt.cert);
       token = jwt.sign(
         claim,
         cert,
-        { algorithm: config.jwt.algorithm, expiresIn: config.tokenLife }
+        { algorithm: config.token.jwt.algorithm, expiresIn: config.token.life }
       );
     }
     else {
       token = jwt.sign(
         claim,
-        config.jwt.secretKey,
-        { expiresIn: config.tokenLife }
+        config.token.jwt.secretKey,
+        { expiresIn: config.token.life }
       );
     }
 

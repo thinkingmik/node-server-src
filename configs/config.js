@@ -1,22 +1,27 @@
 module.exports = {
   development: {
     port: 3000,
-    logLevel: 'debug',
     sessionSecretKey: 'm4bJ%T310Hof$9z',
+    logger: {
+      level: 'debug'
+    },
     crypto: {
-      secretKey: 'K7pHX4OASe?c&lm',
+      secretKey: 'o!rDE(Qbrq7u4OV',
       algorithm: 'AES-256-CBC',
       inputEncoding: 'utf8',
       outputEncoding: 'base64'
     },
-    tokenLife: 3600, //seconds
-    jwt: {
-      enabled: true,
-      ipcheck: false,
-      uacheck: false,
-      secretKey: 'K7pHX4OASe?c&lm',
-      cert: null,
-      algorithm: 'RS256'
+    token: {
+      life: 3600, //seconds
+      length: 32, //bytes
+      jwt: {
+        enabled: false,
+        ipcheck: false,
+        uacheck: false,
+        secretKey: 'K7pHX4OASe?c&lm',
+        cert: null,
+        algorithm: 'RS256'
+      }
     },
     knex: {
       client: 'pg',

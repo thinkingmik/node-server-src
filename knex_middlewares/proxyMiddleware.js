@@ -12,8 +12,8 @@ var fillClientCredentials = function(req, res, callback) {
   var isBasicAuth = false;
 
   // Add ip address and user agent to request
-  req.body['userAgent_' + config.jwt.secretKey] = headerHelper.getUA(req);
-  req.body['ipAddress_' + config.jwt.secretKey] = headerHelper.getIP(req);
+  req.body['userAgent_auto_generated'] = headerHelper.getUA(req);
+  req.body['ipAddress_auto_generated'] = headerHelper.getIP(req);
 
   if (auth != null && auth.indexOf('Basic') >= 0) {
     isBasicAuth = true;
